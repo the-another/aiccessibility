@@ -47,7 +47,7 @@ program
         validateInputTasks(excludeTasks)
         const htmlPath = writeHTMLToDisk(inputHtml);
 
-        const result = pa11y(htmlPath)
+        const result = await pa11y(htmlPath)
         console.log("Pa11y result: ", JSON.stringify(result))
 
         console.log("Function was called with the following arguments:");
