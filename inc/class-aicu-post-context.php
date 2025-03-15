@@ -54,11 +54,15 @@ class AICU_Post_Context {
 	 * @return void
 	 */
 	static function add_meta_box(): void {
+		$post_types = get_post_types( array( 'public' => true ), 'objects' );
+		$post_types = wp_list_pluck( $post_types, 'name' );
+		$post_types = apply_filters( 'aicu/custom_context/post_types', $post_types );
+
 		add_meta_box(
 			'aicu-post-context',
 			__( 'AICU Post Context', 'aicu' ),
 			array( __CLASS__, 'render_meta_box' ),
-			'post',
+			$post_types,
 			'side',
 			'high'
 		);
