@@ -17,13 +17,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^1.8.3",
-    "chalk": "^4.1.2",
-    "commander": "^11.1.0",
-    "dotenv": "^16.4.7",
-    "form-data": "^4.0.2",
-    "openai": "^4.87.3",
-    "ora": "^5.4.1"
+    "commander": "^13.1.0",
+    "pa11y": "^8.0.0"
   },
   "devDependencies": {
     "@types/commander": "^2.12.5",
@@ -34,9 +29,5 @@
   },
   "engines": {
     "node": ">=14.0.0"
-  },
-  "dependencies": {
-    "commander": "^13.1.0",
-    "pa11y": "^8.0.0"
   }
 }

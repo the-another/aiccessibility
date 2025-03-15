@@ -96,7 +96,7 @@ export class OpenAIService {
         // Filter for vision-capable models
         return response.data
           .map(model => model.id)
-          .filter(id => id.includes('gpt-4') || id.includes('vision')); // Filter for likely vision models
+          .filter(id => id.includes('gpt-4o') || id.includes('vision')); // Filter for likely vision models
       }
       
       return [DEFAULT_MODEL]; // Default fallback
