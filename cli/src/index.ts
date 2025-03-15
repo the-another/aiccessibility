@@ -9,7 +9,9 @@ import pa11y from "pa11y";
 import {generateAltTextCommand} from './commands';
 import {Tasks} from "./tasks";
 import {validateInputTasks} from "./utils/validationUtils";
-import {writeHTMLToDisk} from "./utils/fileUtils";
+import {loadPrompt, writeHTMLToDisk} from "./utils/fileUtils";
+import {JSDOM} from 'jsdom';
+import {OpenAIService} from "./services/openAIService";
 
 // Load environment variables
 dotenv.config();
@@ -34,6 +36,7 @@ program
     .option('--include-tasks [tasks...]', 'List of tasks to run. (all if none is selected/excluded)', Tasks.allAvailableTasks())
     .option('--exclude-tasks [tasks...]', 'List of tasks to exclude. (none if none is selected/included)', [])
     .option('--context <string>', "Context of webpage in json format", "{}")
+    .option('-k, --api-key <key>', 'OpenAI API key (can also be set via OPENAI_API_KEY env variable)')
     .argument('<input-html>', 'Base64 encoded HTML file to parse.')
     .action(async (inputHtmlBase64, options) => {
         const inputHtml = atob(inputHtmlBase64);
@@ -46,10 +49,30 @@ program
         validateInputTasks(includeTasks)
         validateInputTasks(excludeTasks)
         const htmlPath = writeHTMLToDisk(inputHtml);
+        const dom = new JSDOM(inputHtml).window.document
+        const openAIService = new OpenAIService({
+            apiKey: options.apiKey,
+            model: options.model,
+        });
 
-        const result = await pa11y(htmlPath)
-        console.log("Pa11y result: ", JSON.stringify(result))
 
+        let issues = (await pa11y(htmlPath)).issues
+        console.log("Pa11y result: ", JSON.stringify(issues))
+        // only use the first 3 issues
+        // TODO - remove this line
+        issues = issues.slice(0, 3)
+
+        const aiFixes = issues.map(async (issue) => {
+            const brokenHTML = dom.querySelector(issue.selector)!.parentElement!.outerHTML
+            const prompt = loadPrompt(brokenHTML, issue.message)
+
+            return await openAIService.sendChatPrompt(prompt)
+        })
+
+        const resolvedFixes = await Promise.all(aiFixes)
+
+        console.log("Resolved fixes: ", JSON.stringify(resolvedFixes))
+        console.log("AI Fixes: ", aiFixes)
         console.log("Function was called with the following arguments:");
         console.log("Threshold:", threshold);
         console.log("Include tasks:", includeTasks);

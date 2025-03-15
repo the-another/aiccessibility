@@ -6,3 +6,12 @@ export function writeHTMLToDisk(inputHtml: string): string {
     fs.writeFileSync(filePath, inputHtml);
     return filePath;
 }
+
+
+export function loadPrompt(htmlWithError: string,  identifiedProblem: string): string {
+    let prompt = fs.readFileSync("src/prompt.txt", "utf8");
+    prompt = prompt.replace("{website-code}", htmlWithError);
+    prompt = prompt.replace("{identified-problems}", identifiedProblem);
+
+    return prompt;
+}
