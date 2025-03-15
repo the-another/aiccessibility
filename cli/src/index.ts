@@ -1,13 +1,14 @@
 import {program} from 'commander';
 import * as fs from "node:fs";
 import {Tasks} from "./tasks";
+import pa11y from "pa11y";
 
 program
     .description("Tool for detecting a11y issues in a web page and trying to provide a solution for some of them.")
     .option('--threshold <number>', 'Threshold of failures, that are tolerated for the numer of errors on the parsed page.', '0')
     .option('--include-tasks [tasks...]', 'List of tasks to run. (all if none is selected/excluded)', Tasks.allAvailableTasks())
     .option('--exclude-tasks [tasks...]', 'List of tasks to exclude. (none if none is selected/included)', [])
-    .option('--context <string>', "Context of webpage in json format", "")
+    .option('--context <string>', "Context of webpage in json format", "{}")
     .argument('<input-html>', 'Base64 encoded HTML file to parse.')
 
 program.parse();
@@ -40,6 +41,9 @@ validateInputTasks(includeTasks)
 validateInputTasks(excludeTasks)
 const htmlPath = writeHTMLToDisk(inputHtml);
 
+pa11y(htmlPath).then((results) => {
+    console.log(results)
+});
 
 console.log("Function was called with the following arguments:");
 console.log("Threshold:", threshold);
