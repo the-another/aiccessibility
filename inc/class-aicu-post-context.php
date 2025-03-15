@@ -77,8 +77,9 @@ class AICU_Post_Context {
 				<label for="aicu-post-context">
 					<?php _e( 'AICU Post Context', 'aicu' ); ?>
 				</label>
-				<textarea id="aicu-post-context" name="aicu-post-context" rows="5" style="width: 100%;">
-					<?php echo esc_textarea( $post_context ); ?>
+				<textarea id="aicu-post-context" name="aicu-post-context" rows="5" style="width: 100%;"><?php
+					echo esc_textarea( $post_context );
+				?>
 				</textarea>
 			</p>
 		<?php

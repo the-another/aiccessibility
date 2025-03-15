@@ -82,9 +82,9 @@ class AICU_Site_Context {
 			<label for="aicu_site_context">
 				<?php _e( 'Site Context', 'aicu' ); ?>
 			</label>
-			<textarea name="aicu_site_context" id="aicu_site_context" class="large-text" rows="5">
-				<?php echo esc_textarea( $site_context ); ?>
-			</textarea>
+			<textarea name="aicu_site_context" id="aicu_site_context" class="large-text" rows="5"><?php
+				echo esc_textarea( $site_context );
+			?></textarea>
 		<?php
 	}
 
