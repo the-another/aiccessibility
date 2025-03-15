@@ -54,12 +54,14 @@ class AICU_Archive_Context {
 	/**
 	 * Add term meta field.
 	 *
-	 * @param WP_Term $term Term object.
+	 * @param WP_Term|string $term Term object or taxonomy name if adding a new term.
+	 *
 	 * @return void
 	 */
-	static function add_term_meta_field( WP_Term $term ): void {
-		$term_id = $term->term_id;
-		$term_meta = get_term_meta( $term_id, 'aicu_term_context', true );
+	static function add_term_meta_field( WP_Term|string $term ): void {
+		$value = $term instanceof WP_Term
+			? get_term_meta( $term->term_id, '_aicu_term_context', true )
+			: '';
 		?>
 			<tr class="form-field">
 				<th scope="row">
@@ -67,7 +69,7 @@ class AICU_Archive_Context {
 				</th>
 				<td>
 					<textarea id="aicu_term_context" name="aicu_term_context"><?php
-						echo esc_textarea( $term_meta );
+						echo esc_textarea( $value );
 					?></textarea>
 					<p class="description"><?php esc_html_e( 'Add custom context for this term.', 'aicu' ); ?></p>
 				</td>
@@ -87,7 +89,7 @@ class AICU_Archive_Context {
 		}
 
 		$term_meta = sanitize_text_field( wp_unslash( $_POST['aicu_term_context'] ) );
-		update_term_meta( $term_id, 'aicu_term_context', $term_meta );
+		update_term_meta( $term_id, '_aicu_term_context', $term_meta );
 	}
 
 	/**
@@ -106,6 +108,6 @@ class AICU_Archive_Context {
 			$term = get_term( $term );
 		}
 
-		return get_term_meta( $term->term_id, 'aicu_term_context', true );
+		return get_term_meta( $term->term_id, '_aicu_term_context', true );
 	}
 }

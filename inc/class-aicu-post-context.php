@@ -59,8 +59,8 @@ class AICU_Post_Context {
 		$post_types = apply_filters( 'aicu/custom_context/post_types', $post_types );
 
 		add_meta_box(
-			'aicu-post-context',
-			__( 'AICU Post Context', 'aicu' ),
+			'aicu',
+			__( 'AICU', 'aicu' ),
 			array( __CLASS__, 'render_meta_box' ),
 			$post_types,
 			'side',
@@ -79,7 +79,7 @@ class AICU_Post_Context {
 		?>
 			<p>
 				<label for="aicu-post-context">
-					<?php _e( 'AICU Post Context', 'aicu' ); ?>
+					<?php _e( 'Post Context', 'aicu' ); ?>
 				</label>
 				<textarea id="aicu-post-context" name="aicu-post-context" rows="5" style="width: 100%;"><?php
 					echo esc_textarea( $post_context );
