@@ -17,7 +17,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "chalk": "^4.1.2",
     "commander": "^13.1.0",
+    "dotenv": "^16.4.7",
+    "openai": "^4.87.3",
+    "ora": "^5.4.1",
     "pa11y": "^8.0.0"
   },
   "devDependencies": {
