@@ -57,7 +57,7 @@ class AICU_Archive_Context {
 	 * @param WP_Term $term Term object.
 	 * @return void
 	 */
-	static function add_term_meta_field( $term ): void {
+	static function add_term_meta_field( WP_Term $term ): void {
 		$term_id = $term->term_id;
 		$term_meta = get_term_meta( $term_id, 'aicu_term_context', true );
 		?>
@@ -81,7 +81,7 @@ class AICU_Archive_Context {
 	 * @param int $term_id Term ID.
 	 * @return void
 	 */
-	static function save_term_context( $term_id ): void {
+	static function save_term_context( int $term_id ): void {
 		if ( ! isset( $_POST['aicu_term_context'] ) ) {
 			return;
 		}
