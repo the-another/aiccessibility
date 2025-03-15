@@ -52,7 +52,7 @@ class AICU_Site_Context {
 			'<label for="aicu_site_context">' . __( 'Site Context', 'aicu' ) . '</label>',
 			array( __CLASS__, 'render_settings_field' ),
 			'general',
-			'aicu_site_context'
+			'aicu'
 		);
 
 		register_setting( 'general', 'aicu_site_context' );
