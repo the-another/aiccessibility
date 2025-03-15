@@ -1,8 +1,14 @@
-#!/usr/bin/env node
+import {program} from 'commander';
 
-function main(): void {
-  console.log('AIccessibility Content Updater CLI');
-  // Your CLI logic here
-}
+program
+    .option('--first')
+    .option('-s, --separator <char>')
+    .argument('<string>');
 
-main();
+program.parse();
+
+const options = program.opts();
+const limit = options.first ? 1 : undefined;
+console.log(program.args[0].split(options.separator, limit));
+
+// Commander example: https://github.com/tj/commander.js?tab=readme-ov-file#installation
