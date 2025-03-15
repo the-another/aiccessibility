@@ -7,6 +7,7 @@ program
     .option('--threshold <number>', 'Threshold of failures, that are tolerated for the numer of errors on the parsed page.', '0')
     .option('--include-tasks [tasks...]', 'List of tasks to run. (all if none is selected/excluded)', Tasks.allAvailableTasks())
     .option('--exclude-tasks [tasks...]', 'List of tasks to exclude. (none if none is selected/included)', [])
+    .option('--context <string>', "Context of webpage in json format", "")
     .argument('<input-html>', 'Base64 encoded HTML file to parse.')
 
 program.parse();
@@ -17,6 +18,7 @@ const inputHtml = atob(program.args[0]);
 const threshold = parseInt(options.threshold);
 const includeTasks = options.includeTasks;
 const excludeTasks = options.excludeTasks;
+const context = JSON.parse(options.context)
 
 function writeHTMLToDisk(inputHtml: string): string {
     let filePath = 'index.html';
@@ -43,5 +45,6 @@ console.log("Threshold:", threshold);
 console.log("Include tasks:", includeTasks);
 console.log("Exclude tasks:", excludeTasks);
 console.log("Input HTML:", inputHtml);
+console.log("Context:", context);
 console.log("HTML was written to disk at: ", htmlPath);
 // Commander example: https://github.com/tj/commander.js?tab=readme-ov-file#installation
