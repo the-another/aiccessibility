@@ -95,14 +95,15 @@ class AICU_Post_Context {
 	 * @return void
 	 */
 	static function save_post_context( int $post_id ): void {
-		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+		if (
+		  ! isset( $_POST['aicu-post-context'] ) ||
+		  ! current_user_can( 'edit_post', $post_id )
+		) {
 			return;
 		}
 
-		if ( isset( $_POST['aicu-post-context'] ) ) {
-			$post_context = sanitize_text_field( $_POST['aicu-post-context'] );
-			update_post_meta( $post_id, '_aicu_post_context', $post_context );
-		}
+		$post_context = sanitize_text_field( $_POST['aicu-post-context'] );
+		update_post_meta( $post_id, '_aicu_post_context', $post_context );
 	}
 
 	/**

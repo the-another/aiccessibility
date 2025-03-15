@@ -105,7 +105,10 @@ class AICU_Archive_Context {
 	 * @return void
 	 */
 	static function save_term_context( int $term_id ): void {
-		if ( ! isset( $_POST['aicu_term_context'] ) ) {
+		if (
+		  ! isset( $_POST['aicu_term_context'] ) ||
+		  ! current_user_can( 'edit_term', $term_id )
+		) {
 			return;
 		}
 
