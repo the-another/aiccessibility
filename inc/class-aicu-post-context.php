@@ -60,10 +60,10 @@ class AICU_Post_Context {
 
 		add_meta_box(
 			'aicu',
-			__( 'AICU', 'aicu' ),
+			__( 'AIccessibility Content Updater', 'aicu' ),
 			array( __CLASS__, 'render_meta_box' ),
 			$post_types,
-			'side',
+			'normal',
 			'high'
 		);
 	}

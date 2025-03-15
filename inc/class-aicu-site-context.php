@@ -42,7 +42,7 @@ class AICU_Site_Context {
 	static function add_settings(): void {
 		add_settings_section(
 			'aicu',
-			__( 'AICU', 'aicu' ),
+			__( 'AIccessibility Content Updater', 'aicu' ),
 			array( __CLASS__, 'render_settings_section' ),
 			'general'
 		);

@@ -22,7 +22,7 @@ class AICU_Archive_Context {
 		$taxonomies = apply_filters( 'aicu/custom_context/archive/taxonomies', $taxonomies );
 
 		foreach ( $taxonomies as $taxonomy ) {
-			add_action( "{$taxonomy}_edit_form_fields", array( __CLASS__, 'add_term_meta_field' ) );
+			add_action( "{$taxonomy}_edit_form_fields", array( __CLASS__, 'edit_term_meta_field' ) );
 			add_action( "{$taxonomy}_add_form_fields", array( __CLASS__, 'add_term_meta_field' ) );
 			add_action( "edited_{$taxonomy}", array( __CLASS__, 'save_term_context' ) );
 			add_action( "created_{$taxonomy}", array( __CLASS__, 'save_term_context' ) );
@@ -54,21 +54,42 @@ class AICU_Archive_Context {
 	/**
 	 * Add term meta field.
 	 *
-	 * @param WP_Term|string $term Term object or taxonomy name if adding a new term.
-	 *
 	 * @return void
 	 */
-	static function add_term_meta_field( WP_Term|string $term ): void {
-		$value = $term instanceof WP_Term
-			? get_term_meta( $term->term_id, '_aicu_term_context', true )
-			: '';
+	static function add_term_meta_field(): void {
 		?>
+	  		<h3><?php esc_html_e( 'AIccessibility Content Updater', 'aicu' ); ?></h3>
+			<div class='form-field term-aicu_term_context-wrap'>
+				<label for="aicu_term_context"><?php esc_html_e( 'Term Context', 'aicu' ); ?></label>
+				<textarea id="aicu_term_context" name="aicu_term_context" rows="5" cols="40"></textarea>
+				<p class="description"><?php esc_html_e( 'Add custom context for this term.', 'aicu' ); ?></p>
+			</div>
+		<?php
+	}
+
+	/**
+	 * Edit term meta field.
+	 *
+	 * @param WP_Term $term Term object.
+	 * @return void
+	 */
+	static function edit_term_meta_field( WP_Term $term ): void {
+		$value = get_term_meta( $term->term_id, '_aicu_term_context', true );
+
+		?>
+	        <tr>
+                <th scope="row" valign="top">
+	                <?php esc_html_e( 'AIccessibility Content Updater', 'aicu' ); ?>
+                </th>
+	        </tr>
 			<tr class="form-field">
 				<th scope="row">
-					<label for="aicu_term_context"><?php esc_html_e( 'AICU Term Context', 'aicu' ); ?></label>
+					<label for="aicu_term_context">
+						<?php esc_html_e( 'Term Context', 'aicu' ); ?>
+					</label>
 				</th>
 				<td>
-					<textarea id="aicu_term_context" name="aicu_term_context"><?php
+					<textarea id="aicu_term_context" name="aicu_term_context" rows="5" cols="40"><?php
 						echo esc_textarea( $value );
 					?></textarea>
 					<p class="description"><?php esc_html_e( 'Add custom context for this term.', 'aicu' ); ?></p>
