@@ -26,7 +26,7 @@ export function generateAltTextCommand(program: Command): void {
         // Initialize OpenAI service
         const openAIService = new OpenAIService({
           apiKey,
-          model: options.model,
+          model: undefined,
         });
 
         // Handle list models option
@@ -49,7 +49,7 @@ export function generateAltTextCommand(program: Command): void {
           console.error(chalk.red('Error: Please provide either a file or base64 data, not both.'));
           process.exit(1);
         }
-        
+
         if (!options.file && !options.base64) {
           console.error(chalk.red('Error: Please provide either a file path (--file) or base64 data (--base64).'));
           process.exit(1);
@@ -76,7 +76,7 @@ export function generateAltTextCommand(program: Command): void {
             process.exit(1);
           }
         }
-        
+
         // Process base64
         if (options.base64) {
           if (!isValidBase64Image(options.base64)) {
@@ -112,4 +112,4 @@ export function generateAltTextCommand(program: Command): void {
     console.log('  $ aicu alt-text --base64 data:image/jpeg;base64,/9j/4AAQ... --model gpt-4o');
     console.log('  $ aicu alt-text --list-models --api-key your-api-key');
   });
-} 
+}
