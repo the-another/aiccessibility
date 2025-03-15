@@ -15,8 +15,10 @@ class AICU_Content_Updater {
 	 * @return void
 	 */
 	static function init(): void {
-		require_once 'class-aicu-output-manager.php';
-		AICU_Output_Manager::init();
+		if ( ! is_admin() ) {
+			require_once 'class-aicu-output-manager.php';
+			AICU_Output_Manager::init();
+		}
 
 		if ( apply_filters( 'aicu/custom_context/site', true ) ) {
 			require_once 'class-aicu-site-context.php';
