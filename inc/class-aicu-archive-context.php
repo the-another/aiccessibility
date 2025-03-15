@@ -16,7 +16,17 @@ class AICU_Archive_Context {
 	 */
 	static function init(): void {
 		add_filter( 'aicu/context', array( __CLASS__, 'add_context' ) );
-		add_action( 'edit_category_form_fields', array( __CLASS__, 'add_term_meta_field' ) );
+
+		$taxonomies = get_taxonomies( array( 'public' => true ), 'objects' );
+		$taxonomies = wp_list_pluck( $taxonomies, 'name' );
+		$taxonomies = apply_filters( 'aicu/custom_context/archive/taxonomies', $taxonomies );
+
+		foreach ( $taxonomies as $taxonomy ) {
+			add_action( "{$taxonomy}_edit_form_fields", array( __CLASS__, 'add_term_meta_field' ) );
+			add_action( "{$taxonomy}_add_form_fields", array( __CLASS__, 'add_term_meta_field' ) );
+			add_action( "edited_{$taxonomy}", array( __CLASS__, 'save_term_context' ) );
+			add_action( "created_{$taxonomy}", array( __CLASS__, 'save_term_context' ) );
+		}
 	}
 
 	/**
@@ -51,15 +61,17 @@ class AICU_Archive_Context {
 		$term_id = $term->term_id;
 		$term_meta = get_term_meta( $term_id, 'aicu_term_context', true );
 		?>
-		<tr class="form-field">
-			<th scope="row">
-				<label for="aicu_term_context"><?php esc_html_e( 'AICU Term Context', 'aicu' ); ?></label>
-			</th>
-			<td>
-				<textarea id="aicu_term_context" name="aicu_term_context"><?php echo esc_textarea( $term_meta ); ?></textarea>
-				<p class="description"><?php esc_html_e( 'Add custom context for this term.', 'aicu' ); ?></p>
-			</td>
-		</tr>
+			<tr class="form-field">
+				<th scope="row">
+					<label for="aicu_term_context"><?php esc_html_e( 'AICU Term Context', 'aicu' ); ?></label>
+				</th>
+				<td>
+					<textarea id="aicu_term_context" name="aicu_term_context"><?php
+						echo esc_textarea( $term_meta );
+					?></textarea>
+					<p class="description"><?php esc_html_e( 'Add custom context for this term.', 'aicu' ); ?></p>
+				</td>
+			</tr>
 		<?php
 	}
 
