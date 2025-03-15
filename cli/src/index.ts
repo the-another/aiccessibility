@@ -21,7 +21,8 @@ const excludeTasks = options.excludeTasks;
 const context = JSON.parse(options.context)
 
 function writeHTMLToDisk(inputHtml: string): string {
-    let filePath = 'index.html';
+    const path = require('node:path');
+    let filePath = path.resolve(process.cwd(), 'index.html');
     fs.writeFileSync(filePath, inputHtml);
     return filePath;
 }
