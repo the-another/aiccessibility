@@ -10,7 +10,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
-    "dev": "curl https://hackathon.cloudfest.com/ | base64 | xargs   ts-node src/index.ts ",
+    "dev": "curl https://hackathon.cloudfest.com/ | base64 | xargs   ts-node src/index.ts detect-a11y",
     "prepublishOnly": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

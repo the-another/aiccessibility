@@ -32,7 +32,7 @@ program
   .option('--threshold <number>', 'Threshold of failures, that are tolerated for the numer of errors on the parsed page.', '0')
   .option('--include-tasks [tasks...]', 'List of tasks to run. (all if none is selected/excluded)', Tasks.allAvailableTasks())
   .option('--exclude-tasks [tasks...]', 'List of tasks to exclude. (none if none is selected/included)', [])
-  .option('--context <string>', "Context of webpage in json format", "{}{}")
+  .option('--context <string>', "Context of webpage in json format", "{}")
   .argument('<input-html>', 'Base64 encoded HTML file to parse.')
   .action((inputHtmlBase64, options) => {
     const inputHtml = atob(inputHtmlBase64);
