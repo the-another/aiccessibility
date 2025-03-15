@@ -41,15 +41,15 @@ class AICU_Site_Context {
 	 */
 	static function add_settings(): void {
 		add_settings_section(
-			'aicu_site_context',
-			__( 'AICU Site Context', 'aicu' ),
+			'aicu',
+			__( 'AICU', 'aicu' ),
 			array( __CLASS__, 'render_settings_section' ),
 			'general'
 		);
 
 		add_settings_field(
 			'aicu_site_context',
-			__( 'Site Context', 'aicu' ),
+			'<label for="aicu_site_context">' . __( 'Site Context', 'aicu' ) . '</label>',
 			array( __CLASS__, 'render_settings_field' ),
 			'general',
 			'aicu_site_context'
@@ -63,13 +63,7 @@ class AICU_Site_Context {
 	 *
 	 * @return void
 	 */
-	static function render_settings_section(): void {
-		?>
-			<p>
-				<?php _e( 'Add custom context to your site.', 'aicu' ); ?>
-			</p>
-		<?php
-	}
+	static function render_settings_section(): void {}
 
 	/**
 	 * Render settings field.
@@ -79,9 +73,6 @@ class AICU_Site_Context {
 	static function render_settings_field(): void {
 		$site_context = static::get_context();
 		?>
-			<label for="aicu_site_context">
-				<?php _e( 'Site Context', 'aicu' ); ?>
-			</label>
 			<textarea name="aicu_site_context" id="aicu_site_context" class="large-text" rows="5"><?php
 				echo esc_textarea( $site_context );
 			?></textarea>

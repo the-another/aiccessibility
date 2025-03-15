@@ -83,8 +83,7 @@ class AICU_Post_Context {
 				</label>
 				<textarea id="aicu-post-context" name="aicu-post-context" rows="5" style="width: 100%;"><?php
 					echo esc_textarea( $post_context );
-				?>
-				</textarea>
+				?></textarea>
 			</p>
 		<?php
 	}
