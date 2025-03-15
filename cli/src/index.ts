@@ -5,10 +5,11 @@ import {Command} from 'commander';
 import chalk from 'chalk';
 // @ts-ignore
 import * as dotenv from 'dotenv';
-import * as fs from "node:fs";
 import pa11y from "pa11y";
 import {generateAltTextCommand} from './commands';
 import {Tasks} from "./tasks";
+import {validateInputTasks} from "./utils/validationUtils";
+import {writeHTMLToDisk} from "./utils/fileUtils";
 
 // Load environment variables
 dotenv.config();
@@ -34,36 +35,20 @@ program
     .option('--exclude-tasks [tasks...]', 'List of tasks to exclude. (none if none is selected/included)', [])
     .option('--context <string>', "Context of webpage in json format", "{}")
     .argument('<input-html>', 'Base64 encoded HTML file to parse.')
-    .action((inputHtmlBase64, options) => {
+    .action(async (inputHtmlBase64, options) => {
         const inputHtml = atob(inputHtmlBase64);
         const threshold = parseInt(options.threshold);
         const includeTasks = options.includeTasks;
         const excludeTasks = options.excludeTasks;
         const context = JSON.parse(options.context);
 
-        function writeHTMLToDisk(inputHtml: string): string {
-            const path = require('node:path');
-            let filePath = path.resolve(process.cwd(), 'index.html');
-            fs.writeFileSync(filePath, inputHtml);
-            return filePath;
-        }
-
-        function validateInputTasks(tasks: string[]): void {
-            tasks.forEach(task => {
-                if (!Tasks.allAvailableTasks().includes(task)) {
-                    console.error(`Task ${task} is not available.`);
-                    process.exit(1);
-                }
-            });
-        }
 
         validateInputTasks(includeTasks)
         validateInputTasks(excludeTasks)
         const htmlPath = writeHTMLToDisk(inputHtml);
 
-        pa11y(htmlPath).then((results: any) => {
-            console.log(results)
-        });
+        const result = pa11y(htmlPath)
+        console.log("Pa11y result: ", JSON.stringify(result))
 
         console.log("Function was called with the following arguments:");
         console.log("Threshold:", threshold);
