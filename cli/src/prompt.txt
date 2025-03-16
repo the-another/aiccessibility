@@ -76,3 +76,4 @@ Depending on the type of issue, follow these guidelines:
 </accessibility-guidelines>
 
 Use a <scratchpad> to think about your approach and to write down your thoughts, before you output the final JSON.
+Then output the final json surrounded by <output> tags.
