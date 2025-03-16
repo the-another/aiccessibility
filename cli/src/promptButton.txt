@@ -1,4 +1,4 @@
-You are an a11y and WCAG2AA expert, and you get a website where we want to identify buttons that aren't Really HTML <button></button>.
+You are an a11y and WCAG2AA expert, and you get a website where we want to identify buttons that aren't properly implemented as HTML <button></button> elements.
 This is the input page:
 <input>
 {website-code}
@@ -7,17 +7,28 @@ This is the input page:
 <schema>
 interface ResultIssueTest {
     code: string; // the WCAG2AA Code of the error
-    correction: string; // the corrected HTML
+    correction: string; // the complete corrected HTML code for the element
     message: string; // Human readable message of what was improved and why
-    css-selector: string; // The css selector with Child combinators pointing to the html element, which will be fixed by this.
+    querySelector: string; // MUST be a unique selector that identifies ONLY the specific element being fixed
 }
 </schema>
 
 Collect all the problems you found with the buttons in an array.
 The contents of the array should adhere to the schema provided in <schema>.
-The css-selector is so specific it identifies only the element on the page, which should be fixed, it must be unique for each element in our <output>.
 The provided correction should try to keep the same style.
 
+<instructions>
+1. For each issue, create a querySelector that uniquely identifies ONLY the specific element:
+   - Use combinations of attributes (id, class, data-attributes)
+   - Include parent-child relationships when needed (e.g., ".parent > .child")
+   - Add :nth-child() or :nth-of-type() when dealing with similar elements
+   - If needed, create selectors based on surrounding unique elements
+
+2. After creating each querySelector, verify it would match EXACTLY ONE element in the document.
+
+3. For each issue, explain the specific a11y problem and how your correction resolves it according to WCAG2AA guidelines.
+</instructions>
+
+Use a <scratchpad> area to think about your solution, list all possible problems and how you would fix them.
+Ensure your selectors are unique by testing them mentally against the document structure.
 Output the array as a JSON in <output> tags.
-Use a <scratchpad> area to think about your solution before you output the <output>.
-Please, my job depends on it and if you do it perfect, we give you 2000$!

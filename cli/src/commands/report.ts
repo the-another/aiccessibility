@@ -32,7 +32,7 @@ export async function getReport(htmlPath: string, openAIService: OpenAIService) 
     const dom = new JSDOM(truncatedHtml)
 
     const prompt = loadPromptButtonProblems(truncatedHtml);
-    const response =  await openAIService.sendChatPrompt(prompt)
+    const response =  await openAIService.sendChatPrompt(prompt, "gpt-4-turbo-2024-04-09")
 
     return results
 
