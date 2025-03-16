@@ -5,7 +5,7 @@ This is the input page:
 </input>
 
 <schema>
-interface ResultIssueTest {
+interface ResultIssue {
     code: string; // the WCAG2AA Code of the error
     correction: string; // the complete corrected HTML code for the element
     message: string; // Human readable message of what was improved and why

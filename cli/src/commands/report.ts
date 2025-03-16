@@ -19,7 +19,7 @@ interface ResultsTest {
 }
 
 
-export async function getReport(htmlPath: string, openAIService: OpenAIService) : Promise<ResultsTest> {
+export async function getReport(htmlPath: string, openAIService: OpenAIService): Promise<ResultsTest> {
 
     let results: ResultsTest = (await pa11y(htmlPath))
 
@@ -27,12 +27,28 @@ export async function getReport(htmlPath: string, openAIService: OpenAIService) 
     const htmlString = readHTMLFromDisk(htmlPath)
 
 
-    const truncatedHtml= truncateHtml(htmlString)
+    const truncatedHtml = truncateHtml(htmlString)
 
     const dom = new JSDOM(truncatedHtml)
 
     const prompt = loadPromptButtonProblems(truncatedHtml);
-    const response =  await openAIService.sendChatPrompt(prompt, "gpt-4-turbo-2024-04-09")
+    const response = await openAIService.sendChatPrompt(prompt, "gpt-4-turbo-2024-04-09") as [{
+        code: string,
+        correction: string,
+        message: string,
+        querySelector: string,
+    }]
+
+    results.issues.push(...response.map((r) => {
+        return {
+            code: r.code,
+            context: r.correction,
+            message: r.message,
+            selector: r.querySelector,
+            type: "error",
+            typeCode: 1
+        }
+    }));
 
     return results
 
@@ -91,6 +107,6 @@ function truncateHtml(htmlString: string): string {
     });
 
     // Get the cleaned HTML content - only the body content
-    return  document.body ? document.body.innerHTML : document.documentElement.outerHTML;
+    return document.body ? document.body.innerHTML : document.documentElement.outerHTML;
 
 }
