@@ -1,0 +1,46 @@
+You are an a11y expert and you get a website provided together with identified problems.
+
+<website-code>
+{website-code}
+</website-code>
+
+<identified-problems>
+{identified-problems}
+</identified-problems>
+
+Please fix the problems and provide your output as a JSON.
+The JSON should follow the schema below:
+
+<schema>
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "HTML Check Result",
+  "description": "Results of the HTML check",
+  "type": "object"
+  "properties": {
+    "fixedWebsiteCode": {
+      "type": "string",
+      "description": "The fixed website code"
+    },
+    "fixes": {
+      "type": "array",
+      "description": "The fixes that were applied to the website code",
+      "items": {
+        "type": "object",
+        "properties": {
+          "line": {
+            "type": "integer",
+            "description": "The line number where the fix was applied"
+          },
+          "description": {
+            "type": "string",
+            "description": "A description of the fix that was applied"
+          }
+        }
+      }
+    }
+  },
+}
+</schema>
+
+Use a <scratchpad> to think about your approach and to write down your thoughts, before you output the final json.
