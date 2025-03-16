@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Accessibility Testing Page</title>
+    <style>
+        .skip-link {
+            position: absolute;
+            left: -9999px;
+        }
+        .nav-item {
+            display: inline-block;
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Missing skip content link -->
+    
+    <header>
+        <nav>
+            <ul>
+                <li class="nav-item"><a href="#">Home</a></li>
+                <li class="nav-item"><a href="#">About</a></li>
+                <li class="nav-item"><a href="#">Services</a></li>
+                <li class="nav-item"><a href="#">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main>
+        <!-- Missing alt text for image -->
+        <img src="placeholder.jpg" width="300" height="200">
+        
+        <!-- Button without accessible name -->
+        <button></button>
+        
+        <!-- Div used as button without proper role -->
+        <div onclick="alert('clicked')">Click me</div>
+        
+        <!-- Poor heading structure -->
+        <h3>This should be an h1</h3>
+        
+        <div>
+            <!-- Missing form labels -->
+            <form>
+                <input type="text" placeholder="Name">
+                <input type="email" placeholder="Email">
+                <input type="submit" value="Submit">
+            </form>
+        </div>
+    </main>
+    
+    <footer>
+        <p>&copy; 2023 Test Company</p>
+    </footer>
+</body>
+</html> 
