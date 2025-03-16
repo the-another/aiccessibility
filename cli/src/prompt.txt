@@ -8,7 +8,8 @@ You are an a11y expert and you get a website provided together with identified p
 {identified-problems}
 </identified-problems>
 
-Please fix the problems and provide your output in the following format:
+Please fix the problems and provide your output as a JSON.
+The JSON should follow the schema below:
 
 <schema>
 {
