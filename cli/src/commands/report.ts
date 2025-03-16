@@ -1,6 +1,7 @@
 import pa11y from "pa11y";
-import {loadPromptButtonProblems, loadPromptButtonProblems, readHTMLFromDisk} from "../utils/fileUtils";
+import {loadPromptButtonProblems, readHTMLFromDisk} from "../utils/fileUtils";
 import {JSDOM} from "jsdom";
+import {OpenAIService} from "../services/openAIService";
 
 interface ResultIssueTest {
     code: string;
@@ -18,7 +19,7 @@ interface ResultsTest {
 }
 
 
-export async function getReport(htmlPath: string) : Promise<ResultsTest> {
+export async function getReport(htmlPath: string, openAIService: OpenAIService) : Promise<ResultsTest> {
 
     let results: ResultsTest = (await pa11y(htmlPath))
 
@@ -31,6 +32,8 @@ export async function getReport(htmlPath: string) : Promise<ResultsTest> {
     const dom = new JSDOM(truncatedHtml)
 
     const prompt = loadPromptButtonProblems(truncatedHtml);
+    const response =  await openAIService.sendChatPrompt(prompt)
+
     return results
 
 

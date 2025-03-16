@@ -1,6 +1,23 @@
-You are an a11y and WCAG2AA expert.
-
-
-<website-code>
+You are an a11y and WCAG2AA expert, and you get a website where we want to identify buttons that aren't Really HTML <button></button>.
+This is the input page:
+<input>
 {website-code}
-</website-code>
+</input>
+
+<schema>
+interface ResultIssueTest {
+    code: string; // the WCAG2AA Code of the error
+    correction: string; // the corrected HTML
+    message: string; // Human readable message of what was improved and why
+    css-selector: string; // The css selector with Child combinators pointing to the html element, which will be fixed by this.
+}
+</schema>
+
+Collect all the problems you found with the buttons in an array.
+The contents of the array should adhere to the schema provided in <schema>.
+The css-selector is so specific it identifies only the element on the page, which should be fixed, it must be unique for each element in our <output>.
+The provided correction should try to keep the same style.
+
+Output the array as a JSON in <output> tags.
+Use a <scratchpad> area to think about your solution before you output the <output>.
+Please, my job depends on it and if you do it perfect, we give you 2000$!
