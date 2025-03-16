@@ -114,7 +114,7 @@ export class OpenAIService {
      * @param prompt The text prompt to send
      * @param model Optional model override (defaults to gpt-3.5-turbo)
      */
-    async sendChatPrompt(prompt: string, model = 'gpt-3.5-turbo-0125'): Promise<string> {
+    async sendChatPrompt(prompt: string, model = 'gpt-3.5-turbo-0125'): Promise<any> {
         const completion = await this.openai.chat.completions.create({
             model: model,
             messages: [
@@ -127,7 +127,10 @@ export class OpenAIService {
 
         // Extract the generated text
         if (completion.choices && completion.choices.length > 0 && completion.choices[0].message.content) {
-            return completion.choices[0].message.content.trim();
+            const llmResponse = completion.choices[0].message.content.trim();
+            let jsonResponse = llmResponse.split("<output>")[1];
+            jsonResponse = jsonResponse.replace("</output>", "");
+            return JSON.parse(jsonResponse);
         }
 
         throw new Error('No response generated from API');

@@ -12,6 +12,7 @@ import {validateInputTasks} from "./utils/validationUtils";
 import {loadPrompt, writeHTMLToDisk} from "./utils/fileUtils";
 import {JSDOM} from 'jsdom';
 import {OpenAIService} from "./services/openAIService";
+import fs from "fs";
 
 // Load environment variables
 dotenv.config();
@@ -49,7 +50,7 @@ program
         validateInputTasks(includeTasks)
         validateInputTasks(excludeTasks)
         const htmlPath = writeHTMLToDisk(inputHtml);
-        const dom = new JSDOM(inputHtml).window.document
+        const dom = new JSDOM(inputHtml)
         const openAIService = new OpenAIService({
             apiKey: options.apiKey,
             model: options.model,
@@ -63,10 +64,12 @@ program
         issues = issues.slice(0, 3)
 
         const aiFixes = issues.map(async (issue) => {
-            const brokenHTML = dom.querySelector(issue.selector)!.parentElement!.outerHTML
+            const brokenHTML = dom.window.document.querySelector(issue.selector)!.parentElement!.outerHTML
             const prompt = loadPrompt(brokenHTML, issue.message)
 
-            return await openAIService.sendChatPrompt(prompt)
+            const result =  await openAIService.sendChatPrompt(prompt)
+
+            dom.window.document.querySelector(issue.selector)!.parentElement!.outerHTML = result.fixedWebsiteCode
         })
 
         const resolvedFixes = await Promise.all(aiFixes)
@@ -79,6 +82,8 @@ program
         console.log("Exclude tasks:", excludeTasks);
         console.log("HTML was written to disk at:", htmlPath);
         console.log("Context:", context);
+
+        fs.writeFileSync("output.html", dom.serialize())
 
         // TODO: Implement the actual a11y detection logic here
     });
