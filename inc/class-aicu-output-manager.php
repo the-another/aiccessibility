@@ -43,7 +43,7 @@ class AICU_Output_Manager {
 	 * @param string $html HTML to send to CLI.
 	 *
 	 * @return string
-	 * @noinspection PhpParamsInspection*/
+	 */
 	static function improve_html( string $html ): string {
 		$filtered_html = apply_filters( 'aicu/improve_html/html', $html );
 		$context = apply_filters( 'aicu/improve_html/context', AICU_Content_Updater::get_context() );
