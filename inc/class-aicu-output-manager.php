@@ -81,7 +81,7 @@ class AICU_Output_Manager {
 				$diff_orig = $diff->orig ? trim( implode( '', $diff->orig ) ) : '';
 				$diff_final = $diff->final ? trim( implode( '', $diff->final ) ) : '';
 
-				QM::alert( <<<ALERT
+				QM::debug( <<<ALERT
 				Inaccessible part detected:
 				Original: {$diff_orig}
 				Improved: {$diff_final}
