@@ -1,39 +1,42 @@
 {
-  "name": "aicu-cli",
-  "version": "1.0.0",
-  "description": "AIccessibility Content Updater CLI",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "bin": {
-    "aicu": "./dist/index.js"
-  },
-  "scripts": {
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "dev": "curl https://hackathon.cloudfest.com/ | base64 | xargs   ts-node src/index.ts detect-a11y",
-    "prepublishOnly": "npm run build",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "chalk": "^4.1.2",
-    "commander": "^13.1.0",
-    "dotenv": "^16.4.7",
-    "jsdom": "^26.0.0",
-    "openai": "^4.87.3",
-    "ora": "^5.4.1",
-    "pa11y": "^8.0.0"
-  },
-  "devDependencies": {
-    "@types/commander": "^2.12.5",
-    "@types/jsdom": "^21.1.7",
-    "@types/node": "^20.11.0",
-    "@types/pa11y": "^5.3.7",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
-  },
-  "engines": {
-    "node": ">=14.0.0"
-  }
+    "name": "aicu-cli",
+    "version": "1.0.0",
+    "description": "AIccessibility Content Updater CLI",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "bin": {
+        "aicu": "./dist/index.js"
+    },
+    "scripts": {
+        "build": "tsc",
+        "start": "node dist/index.js",
+        "dev": "curl https://hackathon.cloudfest.com/ | base64 | xargs   ts-node src/index.ts detect-a11y",
+        "prepublishOnly": "npm run build",
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "format": "prettier --write \"**/*.{ts,js,tsx,jsx,json,md}\"",
+        "format:check": "prettier --check \"**/*.{ts,js,tsx,jsx,json,md}\""
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "chalk": "^4.1.2",
+        "commander": "^13.1.0",
+        "dotenv": "^16.4.7",
+        "jsdom": "^26.0.0",
+        "openai": "^4.87.3",
+        "ora": "^5.4.1",
+        "pa11y": "^8.0.0"
+    },
+    "devDependencies": {
+        "@types/commander": "^2.12.5",
+        "@types/jsdom": "^21.1.7",
+        "@types/node": "^20.11.0",
+        "@types/pa11y": "^5.3.7",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.3.3",
+        "prettier": "^3.5.3"
+    },
+    "engines": {
+        "node": ">=14.0.0"
+    }
 }

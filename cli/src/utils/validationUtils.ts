@@ -1,4 +1,4 @@
-import {Tasks} from "../tasks";
+import { Tasks } from '../tasks';
 
 export function validateInputTasks(tasks: string[]): void {
     tasks.forEach(task => {

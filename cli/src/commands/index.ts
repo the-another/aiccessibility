@@ -1,2 +1,2 @@
 // Re-export commands
-export * from './generateAltText'; 
+export * from './generateAltText';

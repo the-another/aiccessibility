@@ -1,9 +1,7 @@
 export enum Tasks {
     // TODO: Add tasks here
     TODO = 'TODO',
-
 }
-
 
 export namespace Tasks {
     export function allAvailableTasks(): string[] {

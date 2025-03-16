@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
 import fs from 'fs';
-import {promisify} from 'util';
+import { promisify } from 'util';
 
 const readFile = promisify(fs.readFile);
 
@@ -20,7 +20,7 @@ export class OpenAIService {
 
     constructor(options: OpenAIConfig) {
         this.openai = new OpenAI({
-            apiKey: options.apiKey
+            apiKey: options.apiKey,
         });
         this.model = options.model || DEFAULT_MODEL;
     }
@@ -53,29 +53,34 @@ export class OpenAIService {
                 model: this.model,
                 messages: [
                     {
-                        role: "system",
-                        content: "You are an assistant that generates descriptive alt text for images, focusing on accessibility."
+                        role: 'system',
+                        content:
+                            'You are an assistant that generates descriptive alt text for images, focusing on accessibility.',
                     },
                     {
-                        role: "user",
+                        role: 'user',
                         content: [
                             {
-                                type: "text",
-                                text: "Generate a concise and descriptive alt text for this image, focusing on accessibility for screen readers. Include key visual elements, context, and purpose."
+                                type: 'text',
+                                text: 'Generate a concise and descriptive alt text for this image, focusing on accessibility for screen readers. Include key visual elements, context, and purpose.',
                             },
                             {
-                                type: "image_url",
+                                type: 'image_url',
                                 image_url: {
-                                    url: imageUrl
-                                }
-                            }
-                        ]
-                    }
+                                    url: imageUrl,
+                                },
+                            },
+                        ],
+                    },
                 ],
             });
 
             // Extract the generated alt text
-            if (completion.choices && completion.choices.length > 0 && completion.choices[0].message.content) {
+            if (
+                completion.choices &&
+                completion.choices.length > 0 &&
+                completion.choices[0].message.content
+            ) {
                 return completion.choices[0].message.content.trim();
             }
 
@@ -119,18 +124,21 @@ export class OpenAIService {
             model: model,
             messages: [
                 {
-                    role: "user",
-                    content: prompt
-                }
+                    role: 'user',
+                    content: prompt,
+                },
             ],
         });
 
         // Extract the generated text
-        if (completion.choices && completion.choices.length > 0 && completion.choices[0].message.content) {
+        if (
+            completion.choices &&
+            completion.choices.length > 0 &&
+            completion.choices[0].message.content
+        ) {
             return completion.choices[0].message.content.trim();
         }
 
         throw new Error('No response generated from API');
     }
-
 }
