@@ -41,7 +41,6 @@ class AICU_Output_Manager {
 	 * Send HTML to CLI.
 	 *
 	 * @param string $html HTML to send to CLI.
-	 *
 	 * @return string
 	 */
 	static function improve_html( string $html ): string {
