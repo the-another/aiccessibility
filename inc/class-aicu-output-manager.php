@@ -34,7 +34,9 @@ class AICU_Output_Manager {
 	 * @return void
 	 */
 	static function end_output_buffer(): void {
-		ob_end_flush();
+		if ( ob_get_level() ) {
+			ob_end_flush();
+		}
 	}
 
 	/**
