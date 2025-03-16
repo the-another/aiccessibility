@@ -17,7 +17,22 @@ class AICU_Post_Context {
 	static function init(): void {
 		add_filter( 'aicu/context', array( __CLASS__, 'add_context' ) );
 		add_action( 'add_meta_boxes', array( __CLASS__, 'add_meta_box' ) );
-		add_action( 'save_post', array( __CLASS__, 'save_post_context' ) );
+		foreach ( static::get_post_types() as $post_type ) {
+			add_action( "save_post_{$post_type}", array( __CLASS__, 'save_post_context' ) );
+		}
+		add_action( 'edit_attachment', array( __CLASS__, 'save_post_context' ) );
+	}
+
+	/**
+	 * Get post types.
+	 *
+	 * @return array
+	 */
+	static function get_post_types(): array {
+		$post_types = get_post_types( array( 'public' => true ), 'objects' );
+		$post_types = wp_list_pluck( $post_types, 'name' );
+
+		return apply_filters( 'aicu/custom_context/post_types', $post_types );
 	}
 
 	/**
@@ -54,15 +69,11 @@ class AICU_Post_Context {
 	 * @return void
 	 */
 	static function add_meta_box(): void {
-		$post_types = get_post_types( array( 'public' => true ), 'objects' );
-		$post_types = wp_list_pluck( $post_types, 'name' );
-		$post_types = apply_filters( 'aicu/custom_context/post_types', $post_types );
-
 		add_meta_box(
 			'aicu',
 			__( 'AIccessibility Content Updater', 'aicu' ),
 			array( __CLASS__, 'render_meta_box' ),
-			$post_types,
+			static::get_post_types(),
 			'normal',
 			'high'
 		);
