@@ -26,6 +26,11 @@ class AICU_Media_Manager {
 		add_action( 'admin_footer', array( __CLASS__, 'focus_on_alt_field' ) );
 	}
 
+	/**
+	 * Add attachment alt filter dropdown.
+	 *
+	 * @return void
+	 */
 	static function add_attachment_alt_filter(): void {
 		$screen = get_current_screen();
 
@@ -54,6 +59,13 @@ class AICU_Media_Manager {
 		<?php
 	}
 
+	/**
+	 * Filter attachments by alt text.
+	 *
+	 * @param WP_Query $query
+	 *
+	 * @return void
+	 */
 	static function filter_attachments_by_alt( WP_Query $query ): void {
 		if ( ! is_admin() || ! $query->is_main_query() ) {
 			return;
@@ -87,6 +99,13 @@ class AICU_Media_Manager {
 		}
 	}
 
+	/**
+	 * Add "Generate Alt-Text" column to the Media Library.
+	 *
+	 * @param array $columns
+	 *
+	 * @return array
+	 */
 	static function add_generate_alt_admin_column( array $columns ): array {
 		$value = filter_input( INPUT_GET, 'aicu_attachment_alt', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
@@ -107,6 +126,15 @@ class AICU_Media_Manager {
 		return $new_columns;
 	}
 
+	/**
+	 * Render "Generate Alt-Text" column in the Media Library.
+	 *
+	 * @param string $column_name
+	 * @param int $attachment_id
+	 *
+	 * @return void
+	 */
+
 	static function render_generate_alt_admin_column( string $column_name, int $attachment_id ): void {
 		if ( 'generate_alt' !== $column_name ) {
 			return;
@@ -122,6 +150,11 @@ class AICU_Media_Manager {
 		<?php
 	}
 
+	/**
+	 * Add AIccessibility Content Updater submenu page.
+	 *
+	 * @return void
+	 */
 	static function add_submenu_page(): void {
 		add_submenu_page(
 			'upload.php',
@@ -132,6 +165,16 @@ class AICU_Media_Manager {
 		);
 	}
 
+	/**
+	 * Get post metadata.
+	 *
+	 * @param mixed $value
+	 * @param int $object_id
+	 * @param string $meta_key
+	 * @param bool $single
+	 *
+	 * @return mixed
+	 */
 	static function get_post_metadata( $value, $object_id, $meta_key, $single ) {
 		if (
 		    ! empty( $value ) ||
@@ -152,6 +195,11 @@ class AICU_Media_Manager {
 		return $single ? $alt_text : array( $alt_text );
 	}
 
+	/**
+	 * Focus on the alt text field when generating alt text.
+	 *
+	 * @return void
+	 */
 	static function focus_on_alt_field(): void {
 		$screen = get_current_screen();
 
