@@ -49,10 +49,13 @@ class AICU_Site_Context {
 
 		add_settings_field(
 			'aicu_site_context',
-			'<label for="aicu_site_context">' . __( 'Site Context', 'aicu' ) . '</label>',
+			__( 'Site Context', 'aicu' ),
 			array( __CLASS__, 'render_settings_field' ),
 			'general',
-			'aicu'
+			'aicu',
+			array(
+				'label_for' => 'aicu_site_context',
+			)
 		);
 
 		register_setting( 'general', 'aicu_site_context' );
