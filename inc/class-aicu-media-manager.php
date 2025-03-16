@@ -33,7 +33,7 @@ class AICU_Media_Manager {
 			return;
 		}
 
-		$value = filter_input( INPUT_GET, 'aicu_attachment_alt', FILTER_SANITIZE_STRING );
+		$value = filter_input( INPUT_GET, 'aicu_attachment_alt', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
 		$choices = array(
             '' => __( 'All Media', 'textdomain' ),
@@ -65,7 +65,7 @@ class AICU_Media_Manager {
 			return;
 		}
 
-		$value = filter_input( INPUT_GET, 'aicu_attachment_alt', FILTER_SANITIZE_STRING );
+		$value = filter_input( INPUT_GET, 'aicu_attachment_alt', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
 		if ( ! $value ) {
 			return;
@@ -88,7 +88,7 @@ class AICU_Media_Manager {
 	}
 
 	static function add_generate_alt_admin_column( array $columns ): array {
-		$value = filter_input( INPUT_GET, 'aicu_attachment_alt', FILTER_SANITIZE_STRING );
+		$value = filter_input( INPUT_GET, 'aicu_attachment_alt', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
 		if ( 'no-alt' !== $value ) {
 			return $columns;
