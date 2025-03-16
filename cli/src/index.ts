@@ -55,7 +55,7 @@ program
             apiKey: options.apiKey,
             model: options.model,
         });
-
+        const pageSummary = await openAIService.summarizePage(inputHtml);
 
         let issues = (await pa11y(htmlPath)).issues
         console.log("Pa11y result: ", JSON.stringify(issues))
@@ -82,6 +82,7 @@ program
         console.log("Exclude tasks:", excludeTasks);
         console.log("HTML was written to disk at:", htmlPath);
         console.log("Context:", context);
+        console.log("Page summary:", pageSummary);
 
         fs.writeFileSync("output.html", dom.serialize())
 
