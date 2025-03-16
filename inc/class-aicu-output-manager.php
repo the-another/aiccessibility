@@ -42,14 +42,14 @@ class AICU_Output_Manager {
 	/**
 	 * Send HTML to CLI.
 	 *
-	 * @param string $html HTML to send to CLI.
+	 * @param string $orig_html HTML to send to CLI.
 	 * @return string
 	 */
-	static function improve_html( string $html ): string {
-		$filtered_html = apply_filters( 'aicu/improve_html/html', $html );
+	static function improve_html( string $orig_html ): string {
+		$filtered_html = apply_filters( 'aicu/improve_html/html', $orig_html );
 		$context = apply_filters( 'aicu/improve_html/context', AICU_Content_Updater::get_context() );
 
-		$b64_improved_html = AICU_Content_Updater::call_cli(
+		$b64_impr_html = AICU_Content_Updater::call_cli(
 			'improve-html',
 			array(
 				base64_encode( $filtered_html ),
@@ -59,38 +59,64 @@ class AICU_Output_Manager {
 			)
 		);
 
-		if ( ! $b64_improved_html ) {
-			return $html;
+		if ( ! $b64_impr_html ) {
+			return $orig_html;
 		}
 
-		$improved_html = base64_decode( $b64_improved_html );
+		$impr_html = base64_decode( $b64_impr_html );
 
 		if ( class_exists( 'QM' ) ) {
 			if ( ! class_exists( 'WP_Text_Diff_Renderer_Table', false ) ) {
 				require ABSPATH . WPINC . '/wp-diff.php';
 			}
 
-			$o = explode( "\n", normalize_whitespace( $html ) );
-			$i = explode( "\n", normalize_whitespace( $improved_html ) );
+			$orig_lines = explode( "\n", normalize_whitespace( $orig_html ) );
+			$impr_lines = explode( "\n", normalize_whitespace( $impr_html ) );
 
-			$text_diff = new Text_Diff( $o, $i );
+			$line_diff = new Text_Diff( $orig_lines, $impr_lines );
 
-			foreach ( $text_diff->getDiff() as $diff ) {
-				if ( $diff instanceof Text_Diff_Op_copy ) {
+			foreach ( $line_diff->getDiff() as $l_diff ) {
+				if ( $l_diff instanceof Text_Diff_Op_copy ) {
 					continue;
 				}
 
-				$diff_orig = $diff->orig ? trim( implode( '', $diff->orig ) ) : '';
-				$diff_final = $diff->final ? trim( implode( '', $diff->final ) ) : '';
+				$orig_line = $l_diff->orig ? trim( implode( '', $l_diff->orig ) ) : '';
+				$impr_line = $l_diff->final ? trim( implode( '', $l_diff->final ) ) : '';
 
-				QM::debug( <<<ALERT
-				Inaccessible part detected:
-				Original: {$diff_orig}
-				Improved: {$diff_final}
-				ALERT );
+				$orig_nodes = preg_split( '/(<[^>]+>|\\n)/', $orig_line, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY );
+				$impr_nodes = preg_split( '/(<[^>]+>|\\n)/', $impr_line, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY );
+
+				$node_diff = new Text_Diff( $orig_nodes, $impr_nodes );
+
+				foreach ( $node_diff->getDiff() as $n_diff ) {
+					if ( $n_diff instanceof Text_Diff_Op_copy ) {
+						continue;
+					}
+
+					$orig_node  = $n_diff->orig ? trim( implode( '', $n_diff->orig ) ) : '';
+					$impr_node = $n_diff->final ? trim( implode( '', $n_diff->final ) ) : '';
+
+					// If node comparison contains HTML tags, log only the affected nodes.
+					if (
+						str_contains( $orig_node, '<' ) ||
+						str_contains( $impr_node, '<' )
+					) {
+						QM::debug( <<<ALERT
+						Inaccessible html detected (node):
+						Original: {$orig_node}
+						Improved: {$impr_node}
+						ALERT );
+					} else {
+						QM::debug( <<<ALERT
+						Inaccessible html detected (line):
+						Original: {$orig_line}
+						Improved: {$impr_line}
+						ALERT );
+					}
+				}
 			}
 		}
 
-		return $improved_html;
+		return $impr_html;
 	}
 }
