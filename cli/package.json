@@ -10,7 +10,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
-    "dev": "cat mocks/html/BasicSite.html | base64 | xargs   ts-node src/index.ts get-report -k $OPEN_AI_KEY",
+    "dev": "cat ../mocks/html/BasicSite.html | base64 | xargs   ts-node src/index.ts get-report -k $OPEN_AI_KEY",
     "prepublishOnly": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
