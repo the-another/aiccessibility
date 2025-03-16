@@ -155,6 +155,7 @@ function as_schedule_single_action($timestamp, $hook, $args = [], $group = '') {
 
 /**
  * Mock WP Cron function
+ * This would instead be a call to queue the updates from CLI later.
  */
 function wp_schedule_single_event($timestamp, $hook, $args = []) {
     global $scheduledTasks;
