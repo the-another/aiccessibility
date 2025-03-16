@@ -115,29 +115,22 @@ export class OpenAIService {
      * @param model Optional model override (defaults to gpt-3.5-turbo)
      */
     async sendChatPrompt(prompt: string, model = 'gpt-3.5-turbo-0125'): Promise<string> {
-        try {
-            const completion = await this.openai.chat.completions.create({
-                model: model,
-                messages: [
-                    {
-                        role: "user",
-                        content: prompt
-                    }
-                ],
-            });
+        const completion = await this.openai.chat.completions.create({
+            model: model,
+            messages: [
+                {
+                    role: "user",
+                    content: prompt
+                }
+            ],
+        });
 
-            // Extract the generated text
-            if (completion.choices && completion.choices.length > 0 && completion.choices[0].message.content) {
-                return completion.choices[0].message.content.trim();
-            }
-
-            throw new Error('No response generated from API');
-        } catch (error) {
-            if (error instanceof Error) {
-                throw new Error(`OpenAI API error: ${error.message}`);
-            }
-            throw error;
+        // Extract the generated text
+        if (completion.choices && completion.choices.length > 0 && completion.choices[0].message.content) {
+            return completion.choices[0].message.content.trim();
         }
+
+        throw new Error('No response generated from API');
     }
 
 }
