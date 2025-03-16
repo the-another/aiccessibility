@@ -16,7 +16,7 @@ The JSON should follow the schema below:
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "HTML Check Result",
   "description": "Results of the HTML check",
-  "type": "object"
+  "type": "object",
   "properties": {
     "fixedWebsiteCode": {
       "type": "string",
@@ -35,12 +35,44 @@ The JSON should follow the schema below:
           "description": {
             "type": "string",
             "description": "A description of the fix that was applied"
+          },
+          "wcagGuideline": {
+            "type": "string",
+            "description": "The WCAG guideline that was addressed"
           }
         }
       }
     }
-  },
+  }
 }
 </schema>
 
-Use a <scratchpad> to think about your approach and to write down your thoughts, before you output the final json.
+<accessibility-guidelines>
+Depending on the type of issue, follow these guidelines:
+
+1. ALT_TEXT issues:
+   - Ensure all images have appropriate alt text
+   - Alt text should be descriptive but concise
+   - Decorative images should use alt=""
+   - Complex images should have detailed descriptions
+
+2. BUTTON issues:
+   - All buttons must have accessible names
+   - Interactive elements should be keyboard accessible
+   - Ensure proper roles are assigned to controls
+   - Button text should clearly indicate the action
+
+3. SKIP_CONTENT issues:
+   - Add skip navigation links at the beginning of the page
+   - Ensure proper focus order for keyboard navigation
+   - Implement bypass blocks for repetitive content
+   - Make sure skip links are visible when focused
+
+4. SEMANTIC_STRUCTURE issues:
+   - Use proper heading hierarchy (h1-h6)
+   - Use semantic HTML elements (nav, main, section, etc.)
+   - Ensure page has language attributes
+   - Use landmarks and ARIA roles appropriately
+</accessibility-guidelines>
+
+Use a <scratchpad> to think about your approach and to write down your thoughts, before you output the final JSON.
