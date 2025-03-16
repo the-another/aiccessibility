@@ -1,6 +1,7 @@
 import OpenAI from 'openai';
 import fs from 'fs';
 import {promisify} from 'util';
+import {JSDOM} from "jsdom";
 
 const readFile = promisify(fs.readFile);
 
@@ -130,10 +131,87 @@ export class OpenAIService {
             const llmResponse = completion.choices[0].message.content.trim();
             let jsonResponse = llmResponse.split("<output>")[1];
             jsonResponse = jsonResponse.replace("</output>", "");
-            return JSON.parse(jsonResponse);
+            try {
+                jsonResponse = JSON.parse(jsonResponse);
+                return jsonResponse
+            } catch (e) {
+                console.warn('Failed to parse JSON response:', e);
+                throw e;
+            }
         }
 
         throw new Error('No response generated from API');
     }
 
+    async summarizePage(htmlInput: string): Promise<string> {
+        const dom = new JSDOM(htmlInput);
+        const document = dom.window.document;
+
+        // Remove visual elements (images, SVGs, pictures)
+        document.querySelectorAll('img, svg, picture, video, audio, canvas, iframe').forEach(el => el.remove());
+
+        // Remove style and script elements
+        document.querySelectorAll('style, script, link[rel="stylesheet"]').forEach(el => el.remove());
+
+        // Remove comments
+        const removeComments = (node: Node) => {
+            const childNodes = [...node.childNodes];
+            childNodes.forEach(child => {
+                if (child.nodeType === 8) { // Comment node
+                    child.remove();
+                } else if (child.hasChildNodes()) {
+                    removeComments(child);
+                }
+            });
+        };
+        removeComments(document);
+
+        // Remove non-essential page elements
+        document.querySelectorAll('footer, header, nav, aside, [role="banner"], [role="navigation"]').forEach(el => el.remove());
+
+        // Remove form elements
+        document.querySelectorAll('form, input, button, textarea, select').forEach(el => el.remove());
+
+        // Remove metadata
+        document.querySelectorAll('meta, link[rel="icon"], link[rel="shortcut icon"]').forEach(el => el.remove());
+
+        // Remove empty elements (with no text content)
+        document.querySelectorAll('*').forEach(el => {
+            if (!el.textContent?.trim() && !['html', 'head', 'body'].includes(el.tagName.toLowerCase())) {
+                el.remove();
+            }
+        });
+
+        // Remove all attributes except id and class (to preserve selectors)
+        document.querySelectorAll('*').forEach(el => {
+            const attrs = Array.from(el.attributes);
+            attrs.forEach(attr => {
+                if (attr.name !== 'id' && attr.name !== 'class') {
+                    el.removeAttribute(attr.name);
+                }
+            });
+        });
+
+        // Get the cleaned HTML content - only the body content
+        const bodyContent = document.body ? document.body.innerHTML : document.documentElement.outerHTML;
+
+        // Send the cleaned HTML to the LLM (only the body content to further reduce size)
+        const completion = await this.openai.chat.completions.create({
+            model: "gpt-3.5-turbo",
+            messages: [
+                {
+                    role: "user",
+                    content: "Provide a summary of the page content in two sentences or less, focusing on the main topics and key points. Skip a preamble when outputing the summary. Content: " + bodyContent
+                }
+            ],
+        });
+
+        // Extract the generated text
+        if (completion.choices && completion.choices.length > 0 && completion.choices[0].message.content) {
+            return completion.choices[0].message.content.trim()
+        } else {
+            throw new Error('No response generated from API');
+        }
+
+    }
 }
