@@ -41,8 +41,9 @@ class AICU_Output_Manager {
 	 * Send HTML to CLI.
 	 *
 	 * @param string $html HTML to send to CLI.
+	 *
 	 * @return string
-	 */
+	 * @noinspection PhpParamsInspection*/
 	static function improve_html( string $html ): string {
 		$filtered_html = apply_filters( 'aicu/improve_html/html', $html );
 		$context = apply_filters( 'aicu/improve_html/context', AICU_Content_Updater::get_context() );
@@ -61,6 +62,34 @@ class AICU_Output_Manager {
 			return $html;
 		}
 
-		return base64_decode( $b64_improved_html );
+		$improved_html = base64_decode( $b64_improved_html );
+
+		if ( class_exists( 'QM' ) ) {
+			if ( ! class_exists( 'WP_Text_Diff_Renderer_Table', false ) ) {
+				require ABSPATH . WPINC . '/wp-diff.php';
+			}
+
+			$o = explode( "\n", normalize_whitespace( $html ) );
+			$i = explode( "\n", normalize_whitespace( $improved_html ) );
+
+			$text_diff = new Text_Diff( $o, $i );
+
+			foreach ( $text_diff->getDiff() as $diff ) {
+				if ( $diff instanceof Text_Diff_Op_copy ) {
+					continue;
+				}
+
+				$diff_orig = $diff->orig ? trim( implode( '', $diff->orig ) ) : '';
+				$diff_final = $diff->final ? trim( implode( '', $diff->final ) ) : '';
+
+				QM::alert( <<<ALERT
+				Inaccessible part detected:
+				Original: {$diff_orig}
+				Improved: {$diff_final}
+				ALERT );
+			}
+		}
+
+		return $improved_html;
 	}
 }

@@ -31,8 +31,8 @@ class AICU_Post_Context {
 	static function get_post_types(): array {
 		$post_types = get_post_types( array( 'public' => true ), 'objects' );
 		$post_types = wp_list_pluck( $post_types, 'name' );
-		$post_types = apply_filters( 'aicu/custom_context/post_types', $post_types );
-		return $post_types;
+
+		return apply_filters( 'aicu/custom_context/post_types', $post_types );
 	}
 
 	/**
