@@ -2,6 +2,7 @@ import pa11y from "pa11y";
 import {loadPromptButtonProblems, readHTMLFromDisk} from "../utils/fileUtils";
 import {JSDOM} from "jsdom";
 import {OpenAIService} from "../services/openAIService";
+import fs from "fs";
 
 interface ResultIssueTest {
     code: string;
@@ -21,7 +22,7 @@ interface ResultsTest {
 
 export async function getReport(htmlPath: string, openAIService: OpenAIService): Promise<ResultsTest> {
 
-    let results: ResultsTest = (await pa11y(htmlPath))
+    let results: ResultsTest = (await pa11y(htmlPath, {rootElement: "body"}))
 
 
     const htmlString = readHTMLFromDisk(htmlPath)
@@ -42,14 +43,14 @@ export async function getReport(htmlPath: string, openAIService: OpenAIService):
     results.issues.push(...response.map((r) => {
         return {
             code: r.code,
-            context: r.correction,
+            context: encodeURIComponent(r.correction),
             message: r.message,
             selector: r.querySelector,
             type: "error",
             typeCode: 1
         }
     }));
-
+    fs.writeFileSync('jaGG.txt',JSON.stringify(results))
     return results
 
 
