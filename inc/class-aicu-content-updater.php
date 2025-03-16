@@ -87,10 +87,9 @@ class AICU_Content_Updater {
 			$log_data['flags']      = $flags;
 		}
 
-		$data = var_export( array(
-			'args' => $args,
-			'flags' => $flags,
-		), true );
+		// Example change for testing.
+		$data = base64_decode( $args[0] );
+		$data = preg_replace( '/<title>.*?<\/title>/', '<title>Improve HTML</title>', $data );
 
 		if ( $is_debug ) {
 			$log_data['time_needed'] = microtime( true ) - $log_data['start_time'];
