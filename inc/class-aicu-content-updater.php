@@ -75,29 +75,10 @@ class AICU_Content_Updater {
 	 * @return string|false
 	 */
 	static function call_cli( string $command, array $args = array(), array $flags = array() ): string|false {
-		$is_debug = defined( 'WP_DEBUG' ) && WP_DEBUG &&
-		            apply_filters( 'aicu/debug', true );
-
-		if ( $is_debug ) {
-			$log_data               = array();
-			$log_data['start_time'] = microtime( true );
-			$log_data['url'] = $_SERVER['REQUEST_URI'];
-			$log_data['command']    = $command;
-			$log_data['args']       = $args;
-			$log_data['flags']      = $flags;
-		}
-
 		$data = var_export( array(
 			'args' => $args,
 			'flags' => $flags,
 		), true );
-
-		if ( $is_debug ) {
-			$log_data['time_needed'] = microtime( true ) - $log_data['start_time'];
-			$log_data['$return']     = $data;
-
-			error_log( 'AICU CLI Call: ' . var_export( $log_data, true ) );
-		}
 
 		if ( 'improve-html' === $command ) {
 			return base64_encode( $data );
