@@ -175,7 +175,7 @@ class AICU_Media_Manager {
 	 *
 	 * @return mixed
 	 */
-	static function get_post_metadata( $value, $object_id, $meta_key, $single ) {
+	static function get_post_metadata( mixed $value, int $object_id, string $meta_key, bool $single ): mixed {
 		if (
 		    ! empty( $value ) ||
 			! is_admin() ||
