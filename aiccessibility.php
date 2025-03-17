@@ -16,5 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die;
 }
 
+define( 'AICU_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+
 require_once 'inc/class-aicu-content-updater.php';
 AICU_Content_Updater::init();
