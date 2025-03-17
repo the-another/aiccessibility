@@ -111,36 +111,68 @@ export class OpenAIService {
     }
 
     /**
-     * Send a simple prompt to OpenAI's text-based chat API
-     * @param prompt The text prompt to send
-     * @param model Optional model override (defaults to gpt-3.5-turbo)
+     * Send a chat prompt to the OpenAI API and return the response
+     * @param prompt The chat prompt to send
+     * @param model The OpenAI model to use
+     * @param maxRetries Maximum number of retries for API calls
      */
-    async sendChatPrompt(prompt: string, model = 'gpt-3.5-turbo-0125'): Promise<any> {
-        const completion = await this.openai.chat.completions.create({
-            model: model,
-            messages: [
-                {
-                    role: "user",
-                    content: prompt
-                }
-            ],
-        });
+    async sendChatPrompt(prompt: string, model = 'gpt-3.5-turbo-0125', maxRetries = 3): Promise<any> {
+        let retries = 0;
 
-        // Extract the generated text
-        if (completion.choices && completion.choices.length > 0 && completion.choices[0].message.content) {
-            const llmResponse = completion.choices[0].message.content.trim();
-            let jsonResponse = llmResponse.split("<output>")[1];
-            jsonResponse = jsonResponse.replace("</output>", "");
+        while (retries <= maxRetries) {
             try {
-                jsonResponse = JSON.parse(jsonResponse);
-                return jsonResponse
-            } catch (e) {
-                console.warn('Failed to parse JSON response:', e);
-                throw e;
+                const completion = await this.openai.chat.completions.create({
+                    model: model,
+                    messages: [
+                        {
+                            role: "user",
+                            content: prompt
+                        }
+                    ],
+                });
+
+                // Extract the generated text
+                if (completion.choices && completion.choices.length > 0 && completion.choices[0].message.content) {
+                    const llmResponse = completion.choices[0].message.content.trim();
+
+                    // Check if response contains the expected output format
+                    if (!llmResponse.includes("<output>") || !llmResponse.includes("</output>")) {
+                        if (retries < maxRetries) {
+                            retries++;
+                            continue;
+                        } else {
+                            throw new Error('Response missing proper <output> format after retries');
+                        }
+                    }
+
+                    let jsonResponse = llmResponse.split("<output>")[1];
+                    jsonResponse = jsonResponse.replace("</output>", "");
+                    try {
+                        return JSON.parse(jsonResponse);
+                    } catch (e) {
+                        if (retries < maxRetries) {
+                            retries++;
+                        } else {
+                            throw new Error(`Failed to parse JSON response after ${maxRetries + 1} attempts`);
+                        }
+                    }
+                } else {
+                    if (retries < maxRetries) {
+                        retries++;
+                    } else {
+                        throw new Error('No response generated from API after retries');
+                    }
+                }
+            } catch (error) {
+                if (retries < maxRetries) {
+                    retries++;
+                } else {
+                    throw error;
+                }
             }
         }
 
-        throw new Error('No response generated from API');
+        throw new Error('Failed to get valid response after maximum retries');
     }
 
     async summarizePage(htmlInput: string): Promise<string> {
