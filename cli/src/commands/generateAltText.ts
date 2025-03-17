@@ -7,7 +7,7 @@ import {isValidBase64Image, isValidImageFile} from '../utils/imageUtils';
 async function calculateRelevancy(options:any, openAIService: OpenAIService, altText: string) {
     let combindedContext = options.context
     if (options.page) {
-        const context = await openAIService.summarizePage(options.page)
+        const context = await openAIService.summarizePage(atob(options.page))
         combindedContext += context;
     }
     return await openAIService.checkRelevancyOfAltText(altText, combindedContext);
@@ -17,7 +17,7 @@ export function generateAltTextCommand(program: Command): void {
   program
     .command('alt-text')
     .description('Generate alt text for images using OpenAI API')
-    .option('-f, --file <path>', 'Path to the image file')
+    .option('-f, --file <string>', 'Path to the image file')
     .option('-b, --base64 <string>', 'Base64 encoded image data')
     .option('-k, --api-key <key>', 'OpenAI API key (can also be set via OPENAI_API_KEY env variable)')
     .option('-m, --model <model>', 'OpenAI model to use (defaults to gpt-40)')

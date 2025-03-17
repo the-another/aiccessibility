@@ -32,14 +32,14 @@ export class OpenAIService {
             messages: [
                 {
                     role: "system",
-                    content: "You are an accessibility expert reviewing alt text for an image."
+                    content: "You are an accessibility expert reviewing how good the alt-text is matching the context of the page."
                 },
                 {
                     role: "user",
                     content: [
                         {
                             type: "text",
-                            text: "Check if the following alt text is relevant for the page. Alt text: " + altText + " Context: " + context + " Only return a number for the relevancy: 0 for irrelevant, 1 for relevant."
+                            text: "<alt-text>" + altText + "</alt-text> <page-context>" + context + "</page-context> Think about the score you want to give in a <scrathpad>, list all reasons, why the image could fit, or why it could not fit. Only return a number between 0.0 and 1.0 for the relevancy score in an <output> tag."
                         }
                     ]
                 }
@@ -48,7 +48,9 @@ export class OpenAIService {
 
         // Extract the generated alt text
         if (completion.choices && completion.choices.length > 0 && completion.choices[0].message.content) {
-            return completion.choices[0].message.content.trim();
+            let stringOutput = completion.choices[0].message.content.trim();
+            let jsonResponse = stringOutput.split("<output>")[1];
+            return jsonResponse.replace("</output>", "");
         } else {
             return "1"
         }
