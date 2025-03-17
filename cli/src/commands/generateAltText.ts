@@ -10,6 +10,9 @@ async function calculateRelevancy(options:any, openAIService: OpenAIService, alt
         const context = await openAIService.summarizePage(atob(options.page))
         combindedContext += context;
     }
+    if (!combindedContext) {
+        return '1';
+    }
     return await openAIService.checkRelevancyOfAltText(altText, combindedContext);
 }
 
@@ -76,10 +79,10 @@ export function generateAltTextCommand(program: Command): void {
           try {
             const altText = await openAIService.generateAltText(options.file, false);
             spinner.succeed('Alt text generated successfully');
-            console.log(chalk.green('\nAlt Text:'));
-            console.log(chalk.white(altText));
-            console.log('\nHTML usage:');
-            console.log(chalk.cyan(`<img src="your-image-path" alt="${altText}" />`));
+            process.stderr.write(chalk.green('\nAlt Text:'));
+            process.stderr.write(chalk.white(altText));
+            process.stderr.write('\nHTML usage:');
+            process.stderr.write(chalk.cyan(`<img src="your-image-path" alt="${altText}" />`));
               const relevancy = await calculateRelevancy(options, openAIService, altText);
 
               process.stdout.write(`{
