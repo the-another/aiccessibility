@@ -26,6 +26,36 @@ export class OpenAIService {
         this.model = options.model || DEFAULT_MODEL;
     }
 
+    async checkRelevancyOfAltText(altText: string, context:string): Promise<string> {
+        const completion = await this.openai.chat.completions.create({
+            model: this.model,
+            messages: [
+                {
+                    role: "system",
+                    content: "You are an accessibility expert reviewing how good the alt-text is matching the context of the page."
+                },
+                {
+                    role: "user",
+                    content: [
+                        {
+                            type: "text",
+                            text: "<alt-text>" + altText + "</alt-text> <page-context>" + context + "</page-context> Think about the score you want to give in a <scrathpad>, list all reasons, why the image could fit, or why it could not fit. Only return a number between 0.0 and 1.0 for the relevancy score in an <output> tag."
+                        }
+                    ]
+                }
+            ],
+        });
+
+        // Extract the generated alt text
+        if (completion.choices && completion.choices.length > 0 && completion.choices[0].message.content) {
+            let stringOutput = completion.choices[0].message.content.trim();
+            let jsonResponse = stringOutput.split("<output>")[1];
+            return jsonResponse.replace("</output>", "");
+        } else {
+            return "1"
+        }
+    }
+
     /**
      * Generate alt text for an image using OpenAI's vision model
      * @param imagePath Path to the image file or base64 encoded image data

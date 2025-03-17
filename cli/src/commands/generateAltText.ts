@@ -1,19 +1,32 @@
-import { Command } from 'commander';
+import {Command} from 'commander';
 import chalk from 'chalk';
 import ora from 'ora';
-import fs from 'fs';
-import { OpenAIService } from '../services/openAIService';
-import { isValidImageFile, isValidBase64Image } from '../utils/imageUtils';
+import {OpenAIService} from '../services/openAIService';
+import {isValidBase64Image, isValidImageFile} from '../utils/imageUtils';
+
+async function calculateRelevancy(options:any, openAIService: OpenAIService, altText: string) {
+    let combindedContext = options.context
+    if (options.page) {
+        const context = await openAIService.summarizePage(atob(options.page))
+        combindedContext += context;
+    }
+    if (!combindedContext) {
+        return '1';
+    }
+    return await openAIService.checkRelevancyOfAltText(altText, combindedContext);
+}
 
 export function generateAltTextCommand(program: Command): void {
   program
     .command('alt-text')
     .description('Generate alt text for images using OpenAI API')
-    .option('-f, --file <path>', 'Path to the image file')
+    .option('-f, --file <string>', 'Path to the image file')
     .option('-b, --base64 <string>', 'Base64 encoded image data')
     .option('-k, --api-key <key>', 'OpenAI API key (can also be set via OPENAI_API_KEY env variable)')
     .option('-m, --model <model>', 'OpenAI model to use (defaults to gpt-40)')
     .option('-l, --list-models', 'List available OpenAI vision models')
+    .option('-c, context <string>', 'Context of webpage in json format', '{}')
+    .option('-p, --page <string>', 'Base64 encoded HTML content containing the issue')
     .action(async (options) => {
       try {
         // Check for API key
@@ -66,10 +79,16 @@ export function generateAltTextCommand(program: Command): void {
           try {
             const altText = await openAIService.generateAltText(options.file, false);
             spinner.succeed('Alt text generated successfully');
-            console.log(chalk.green('\nAlt Text:'));
-            console.log(chalk.white(altText));
-            console.log('\nHTML usage:');
-            console.log(chalk.cyan(`<img src="your-image-path" alt="${altText}" />`));
+            process.stderr.write(chalk.green('\nAlt Text:'));
+            process.stderr.write(chalk.white(altText));
+            process.stderr.write('\nHTML usage:');
+            process.stderr.write(chalk.cyan(`<img src="your-image-path" alt="${altText}" />`));
+              const relevancy = await calculateRelevancy(options, openAIService, altText);
+
+              process.stdout.write(`{
+                "altText": "${altText}",
+                "relevancy": ${relevancy}
+            }`);
           } catch (error) {
             spinner.fail('Failed to generate alt text');
             console.error(chalk.red(`Error: ${error instanceof Error ? error.message : String(error)}`));
@@ -92,6 +111,7 @@ export function generateAltTextCommand(program: Command): void {
             console.log(chalk.white(altText));
             console.log('\nHTML usage:');
             console.log(chalk.cyan(`<img src="your-image-path" alt="${altText}" />`));
+
           } catch (error) {
             spinner.fail('Failed to generate alt text');
             console.error(chalk.red(`Error: ${error instanceof Error ? error.message : String(error)}`));

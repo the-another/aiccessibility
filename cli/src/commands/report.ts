@@ -1,8 +1,9 @@
 import pa11y from "pa11y";
 import {loadPromptButtonProblems, readHTMLFromDisk} from "../utils/fileUtils";
-import {JSDOM} from "jsdom";
 import {OpenAIService} from "../services/openAIService";
 import fs from "fs";
+import {JSDOM} from "jsdom";
+
 
 interface ResultIssueTest {
     code: string;
