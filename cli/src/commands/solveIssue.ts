@@ -13,14 +13,14 @@ export function solveIssueCommand(program: Command): void {
     .description('Suggest fixes for identified accessibility issues using AI')
     .option('--issue-type <type>', 'Type of issue to solve (ALT_TEXT, BUTTON, SKIP_CONTENT, SEMANTIC_STRUCTURE)', 'ALT_TEXT')
     .option('--context <string>', 'Context of webpage in json format', '{}')
-    .argument('<issue-data>', 'JSON string containing the issue data to solve')
-    .argument('<html-content>', 'Base64 encoded HTML content containing the issue')
-    .action(async (issueDataJson, htmlContentBase64, options) => {
+    .argument('<issue-data>', 'Path to the JSON containing the issue data to solve')
+    .argument('<html-content>', 'Path to the HTML content file')
+    .action(async (issueDataJsonPath, htmlContentPath, options) => {
       try {
 
         // Parse inputs
-        const issueData = JSON.parse(issueDataJson);
-        const htmlContent = atob(htmlContentBase64);
+        const issueData = JSON.parse(fs.readFileSync(issueDataJsonPath, 'utf-8'));
+        const htmlContent = fs.readFileSync(htmlContentPath, 'utf-8');
         const context = JSON.parse(options.context);
         const issueType = options.issueType as Tasks;
 
@@ -51,6 +51,8 @@ export function solveIssueCommand(program: Command): void {
           spinner.succeed('Solution generated');
 
           process.stdout.write(dom.serialize())
+            const fixedHtmlPath = htmlContentPath.replace('.html', '-fixed.html');
+            fs.writeFileSync(fixedHtmlPath, dom.serialize());
         } catch (error) {
           spinner.fail('Failed to generate solution');
           console.error(chalk.red(`Error: ${error instanceof Error ? error.message : String(error)}`));

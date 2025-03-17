@@ -8,6 +8,7 @@ import {filterIssuesByTask, validateInputTasks} from '../utils/validationUtils';
 import {writeHTMLToDisk} from '../utils/fileUtils';
 import {IssueDetector} from '../utils/issueDetector';
 import {OpenAIService} from "../services/openAIService";
+import fs from "fs";
 
 // Define an interface for our enhanced issue type
 interface EnhancedIssue {
@@ -31,10 +32,10 @@ export function getReportCommand(program: Command): void {
         .option('--exclude-tasks [tasks...]', 'List of tasks to exclude (none if none is selected/included)', [])
         .option('-k, --api-key <key>', 'OpenAI API key (can also be set via OPENAI_API_KEY env variable)')
         .option('--context <string>', 'Context of webpage in json format', '{}')
-        .argument('<input-html>', 'Base64 encoded HTML file to parse')
-        .action(async (inputHtmlBase64, options) => {
+        .argument('<input-html>', 'File path to the HTML content')
+        .action(async (inputHtmlPath, options) => {
             try {
-                const inputHtml = atob(inputHtmlBase64);
+                const inputHtml = fs.readFileSync(inputHtmlPath, 'utf8');
                 const threshold = parseInt(options.threshold);
                 const includeTasks = options.includeTasks;
                 const excludeTasks = options.excludeTasks;
@@ -104,6 +105,8 @@ export function getReportCommand(program: Command): void {
 
                     // Output the report as JSON
                     process.stdout.write(JSON.stringify(report, null, 2));
+                    const reportPath = inputHtmlPath.replace('.html', '-report.json');
+                    fs.writeFileSync(reportPath, JSON.stringify(report));
 
                     // Exit with code based on threshold
                     process.exit(report.passThreshold ? 0 : 1);
