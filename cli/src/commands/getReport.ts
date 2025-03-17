@@ -103,7 +103,7 @@ export function getReportCommand(program: Command): void {
                     };
 
                     // Output the report as JSON
-                    console.log(JSON.stringify(report, null, 2));
+                    process.stdout.write(JSON.stringify(report, null, 2));
 
                     // Exit with code based on threshold
                     process.exit(report.passThreshold ? 0 : 1);

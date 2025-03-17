@@ -50,7 +50,7 @@ export function solveIssueCommand(program: Command): void {
 
           spinner.succeed('Solution generated');
 
-          console.log(dom.serialize())
+          process.stdout.write(dom.serialize())
 
         } catch (error) {
           spinner.fail('Failed to generate solution');
