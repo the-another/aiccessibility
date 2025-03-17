@@ -53,6 +53,9 @@ export function getReportCommand(program: Command): void {
                 const htmlPath = writeHTMLToDisk(inputHtml);
                 const dom = new JSDOM(inputHtml).window.document;
 
+                const preparedHtmlPath = inputHtmlPath.replace('.html', '-prepared.html');
+                fs.writeFileSync(preparedHtmlPath, new JSDOM(inputHtml).serialize(), 'utf8');
+
                 try {
 
                     // Initialize OpenAI service
