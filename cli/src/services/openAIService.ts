@@ -30,10 +30,35 @@ export class OpenAIService {
      * Generate alt text for an image using OpenAI's vision model
      * @param imagePath Path to the image file or base64 encoded image data
      * @param isBase64 Whether the image is provided as base64 data
+     * @param pageContext Optional context about the page or a base64 encoded HTML
+     * @param isHtmlBase64 Whether the pageContext is base64 encoded HTML that needs to be analyzed
      */
-    async generateAltText(imagePath: string, isBase64 = false): Promise<string> {
+    async generateAltText(
+        imagePath: string, 
+        isBase64 = false, 
+        pageContext?: string, 
+        isHtmlBase64 = false
+    ): Promise<{ altText: string; relevancy: number }> {
         try {
             let base64Image: string;
+            let contextInfo: string | undefined = pageContext;
+
+            // Process HTML if provided as base64 to extract context
+            if (pageContext && isHtmlBase64) {
+                try {
+                    // Decode the base64 HTML
+                    const buffer = Buffer.from(pageContext.includes('base64,') 
+                        ? pageContext.split('base64,')[1] 
+                        : pageContext, 'base64');
+                    const htmlContent = buffer.toString('utf-8');
+                    
+                    // Extract the context from the HTML using LLM
+                    contextInfo = await this.summarizePage(htmlContent);
+                } catch (error) {
+                    console.warn('Failed to extract context from HTML, proceeding without context', error);
+                    contextInfo = undefined;
+                }
+            }
 
             if (isBase64) {
                 // Handle base64 image - ensure it's properly formatted
@@ -49,20 +74,28 @@ export class OpenAIService {
             // Prepare base64 image with proper formatting if needed
             const imageUrl = `data:image/jpeg;base64,${base64Image}`;
 
+            // Check if we have valid context info
+            const hasContext = contextInfo !== undefined && contextInfo.trim().length > 0;
+
+            // Create appropriate prompt based on whether context is available
+            const promptContent = hasContext
+                ? `Generate a concise and descriptive alt text for this image, focusing on accessibility for screen readers. Include key visual elements, context, and purpose. ADDITIONALLY, on a scale of 0 to 1, assess how relevant this image is to the following page context: "${contextInfo}". A score of 0 means completely irrelevant, while 1 means highly relevant. Format your response as JSON: {"altText": "your description here", "relevancy": 0.X, "reasoning": "brief explanation of relevancy score"}`
+                : `Generate a concise and descriptive alt text for this image, focusing on accessibility for screen readers. Include key visual elements, context, and purpose. Since no page context was provided, set relevancy score to 0.5 as default. Format your response as JSON: {"altText": "your description here", "relevancy": 0.5, "reasoning": "No page context provided"}`;
+
             // Use OpenAI SDK to call vision-enabled model
             const completion = await this.openai.chat.completions.create({
                 model: this.model,
                 messages: [
                     {
                         role: "system",
-                        content: "You are an assistant that generates descriptive alt text for images, focusing on accessibility."
+                        content: "You are an assistant that generates descriptive alt text for images, focusing on accessibility. You also assess image relevancy to page content."
                     },
                     {
                         role: "user",
                         content: [
                             {
                                 type: "text",
-                                text: "Generate a concise and descriptive alt text for this image, focusing on accessibility for screen readers. Include key visual elements, context, and purpose."
+                                text: promptContent
                             },
                             {
                                 type: "image_url",
@@ -73,11 +106,21 @@ export class OpenAIService {
                         ]
                     }
                 ],
+                response_format: { type: "json_object" }
             });
 
-            // Extract the generated alt text
+            // Extract the generated alt text and relevancy
             if (completion.choices && completion.choices.length > 0 && completion.choices[0].message.content) {
-                return completion.choices[0].message.content.trim();
+                const response = JSON.parse(completion.choices[0].message.content.trim());
+                
+                if (!response.altText) {
+                    throw new Error('No alt text generated from API response');
+                }
+                
+                return {
+                    altText: response.altText,
+                    relevancy: response.relevancy || 0.5 // Default to 0.5 if not provided
+                };
             }
 
             throw new Error('No alt text generated from API response');
