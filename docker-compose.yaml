@@ -38,8 +38,7 @@ services:
         - 8443:443
     volumes:
       - aicu-wp:/var/www/html
-      - ./inc/:/var/www/html/wp-content/mu-plugins/aiccessibility/inc
-      - ./accessability.php:/var/www/html/wp-content/mu-plugins/aiccessibility/accessability.php
+      - ./:/var/www/html/wp-content/mu-plugins/aiccessibility
       - ./docker/files/wordpress/mu-autoload.php:/var/www/html/wp-content/mu-plugins/mu-autoload.php
     secrets:
       - CHATGPT_API_KEY

@@ -71,3 +71,6 @@ if runwpcli core is-installed; then
 fi
 
 echo "WordPress setup finished"
+
+echo "Adjust WordPress permissions"
+chown -R www-data:www-data /var/www/html

@@ -1,6 +1,7 @@
 <?php
 
-$mu_plugins = glob(__DIR__, GLOB_ONLYDIR);
+$mu_plugins = glob(__DIR__ . DIRECTORY_SEPARATOR . '*', GLOB_ONLYDIR);
+
 foreach ($mu_plugins as $path) {
     $name = basename($path);
 

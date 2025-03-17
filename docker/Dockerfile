@@ -80,6 +80,7 @@ COPY ./docker/config/supervisord/supervisord.conf /etc/supervisor/conf.d/supervi
 COPY ./docker/config/wordpress/setup-wordpress.sh /usr/local/bin/setup-wordpress
 RUN chmod +x /usr/local/bin/setup-wordpress
 
+RUN mkdir -p /var/www/html && chown www-data. /var/www/html
 WORKDIR /var/www/html
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
