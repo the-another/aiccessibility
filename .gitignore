@@ -212,4 +212,9 @@ dist
 .pnp.*
 
 .gitconfig-*
+
+vendor
+node_modules
+.idea
+
 *.html
