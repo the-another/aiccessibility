@@ -51,7 +51,6 @@ export function solveIssueCommand(program: Command): void {
           spinner.succeed('Solution generated');
 
           process.stdout.write(dom.serialize())
-
         } catch (error) {
           spinner.fail('Failed to generate solution');
           console.error(chalk.red(`Error: ${error instanceof Error ? error.message : String(error)}`));
