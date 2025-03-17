@@ -9,6 +9,7 @@ import {writeHTMLToDisk} from '../utils/fileUtils';
 import {IssueDetector} from '../utils/issueDetector';
 import {OpenAIService} from "../services/openAIService";
 import fs from "fs";
+import {solveIssues} from "./solveIssue";
 
 // Define an interface for our enhanced issue type
 interface EnhancedIssue {
@@ -28,6 +29,7 @@ export function getReportCommand(program: Command): void {
         .command('get-report')
         .description('Analyze HTML for accessibility issues and return a detailed report')
         .option('--threshold <number>', 'Threshold of failures that are tolerated for the number of errors on the parsed page', '0')
+        .option('--issue-type <type>', 'Type of issue to solve (ALT_TEXT, BUTTON, SKIP_CONTENT, SEMANTIC_STRUCTURE)', 'ALT_TEXT')
         .option('--include-tasks [tasks...]', 'List of tasks to run (all if none is selected/excluded)', Tasks.allAvailableTasks())
         .option('--exclude-tasks [tasks...]', 'List of tasks to exclude (none if none is selected/included)', [])
         .option('-k, --api-key <key>', 'OpenAI API key (can also be set via OPENAI_API_KEY env variable)')
@@ -108,9 +110,10 @@ export function getReportCommand(program: Command): void {
                     const reportPath = inputHtmlPath.replace('.html', '-report.json');
                     fs.writeFileSync(reportPath, JSON.stringify(report));
 
+                    solveIssues(reportPath, inputHtmlPath, options);
+
                     // Exit with code based on threshold
                     process.exit(report.passThreshold ? 0 : 1);
-
                 } catch (error) {
                     spinner.fail('Analysis failed');
                     console.error(chalk.red(`Error: ${error instanceof Error ? error.message : String(error)}`));
