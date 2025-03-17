@@ -87,7 +87,7 @@ class AICU_Content_Updater {
 			$log_data['flags']      = $flags;
 		}
 
-		if ( empty( $args['-k'] ) ) {
+		if ( empty( $flags['-k'] ) ) {
 			$open_ai_key = apply_filters(
 				'aicu/config/open-ai-key',
 				defined( 'AICU_OPEN_AI_KEY' ) ? AICU_OPEN_AI_KEY : '',
@@ -101,7 +101,7 @@ class AICU_Content_Updater {
 				return false;
 			}
 
-			$args['-k'] = $open_ai_key;
+			$flags['-k'] = $open_ai_key;
 		}
 
 		$node_file = escapeshellarg( AICU_PLUGIN_DIR . 'cli/dist/index.js' );
