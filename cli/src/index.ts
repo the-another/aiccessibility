@@ -6,6 +6,9 @@ import chalk from 'chalk';
 // @ts-ignore
 import * as dotenv from 'dotenv';
 import {generateAltTextCommand, getReportCommand, solveIssueCommand} from './commands';
+import {jsdomPatch} from "./utils/JSDOM";
+
+jsdomPatch.setup()
 
 // Load environment variables
 dotenv.config();

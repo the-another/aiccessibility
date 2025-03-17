@@ -26,6 +26,34 @@ export class OpenAIService {
         this.model = options.model || DEFAULT_MODEL;
     }
 
+    async checkRelevancyOfAltText(altText: string, context:string): Promise<string> {
+        const completion = await this.openai.chat.completions.create({
+            model: this.model,
+            messages: [
+                {
+                    role: "system",
+                    content: "You are an accessibility expert reviewing alt text for an image."
+                },
+                {
+                    role: "user",
+                    content: [
+                        {
+                            type: "text",
+                            text: "Check if the following alt text is relevant for the page. Alt text: " + altText + " Context: " + context + " Only return a number for the relevancy: 0 for irrelevant, 1 for relevant."
+                        }
+                    ]
+                }
+            ],
+        });
+
+        // Extract the generated alt text
+        if (completion.choices && completion.choices.length > 0 && completion.choices[0].message.content) {
+            return completion.choices[0].message.content.trim();
+        } else {
+            return "1"
+        }
+    }
+
     /**
      * Generate alt text for an image using OpenAI's vision model
      * @param imagePath Path to the image file or base64 encoded image data

@@ -1,5 +1,4 @@
 import fs from "fs";
-import path from "node:path";
 
 export function writeHTMLToDisk(inputHtml: string): string {
     const path = require('node:path');
@@ -10,11 +9,11 @@ export function writeHTMLToDisk(inputHtml: string): string {
 
 
 export function readHTMLFromDisk(htmlPath: string): string {
-   return      fs.readFileSync(htmlPath, "utf8");
+    return fs.readFileSync(htmlPath, "utf8");
 }
 
 
-export function loadPrompt(htmlWithError: string,  identifiedProblem: string): string {
+export function loadPrompt(htmlWithError: string, identifiedProblem: string): string {
     let prompt = fs.readFileSync("src/prompt.txt", "utf8");
     prompt = prompt.replace("{website-code}", htmlWithError);
     prompt = prompt.replace("{identified-problems}", identifiedProblem);
