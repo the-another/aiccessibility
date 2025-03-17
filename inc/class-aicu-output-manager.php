@@ -91,7 +91,7 @@ class AICU_Output_Manager {
 
 		if ( class_exists( 'QM' ) ) {
 			foreach ( $report['issues'] as $issue ) {
-				QM::error( <<<ALERT
+				QM::alert( <<<ALERT
 				AIccessibility issue found
 				Code: {$issue['code']}
 				Message: {$issue['message']}
