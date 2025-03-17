@@ -13,12 +13,12 @@ export function solveIssueCommand(program: Command): void {
     .description('Suggest fixes for identified accessibility issues using AI')
     .option('--issue-type <type>', 'Type of issue to solve (ALT_TEXT, BUTTON, SKIP_CONTENT, SEMANTIC_STRUCTURE)', 'ALT_TEXT')
     .option('--context <string>', 'Context of webpage in json format', '{}')
+    .argument('<issue-data>', 'JSON string containing the issue data to solve')
     .argument('<html-content>', 'Base64 encoded HTML content containing the issue')
-    .action(async ( htmlContentBase64, options) => {
+    .action(async (issueDataJson, htmlContentBase64, options) => {
       try {
 
         // Parse inputs
-        const issueDataJson =  fs.readFileSync('jaGG.txt', "utf8")
         const issueData = JSON.parse(issueDataJson);
         const htmlContent = atob(htmlContentBase64);
         const context = JSON.parse(options.context);
@@ -31,7 +31,7 @@ export function solveIssueCommand(program: Command): void {
         }
 
         const spinner = ora(`Solving ${issueType} issue...`).start();
-        
+
         try {
           // Parse HTML to DOM
           const dom = new JSDOM(htmlContent);
@@ -49,10 +49,9 @@ export function solveIssueCommand(program: Command): void {
           })
 
           spinner.succeed('Solution generated');
-          fs.writeFileSync('fin.html',dom.serialize())
 
           console.log(dom.serialize())
-          
+
         } catch (error) {
           spinner.fail('Failed to generate solution');
           console.error(chalk.red(`Error: ${error instanceof Error ? error.message : String(error)}`));
@@ -63,4 +62,4 @@ export function solveIssueCommand(program: Command): void {
         process.exit(1);
       }
     });
-} 
+}
