@@ -87,21 +87,59 @@ class AICU_Content_Updater {
 			$log_data['flags']      = $flags;
 		}
 
-		// Example change for testing.
-		$data = base64_decode( $args[0] );
-		$data = preg_replace( '/<title>.*?<\/title>/', '<title>Improve HTML</title>', $data );
+		if ( empty( $args['-k'] ) ) {
+			$open_ai_key = apply_filters(
+				'aicu/config/open-ai-key',
+				defined( 'AICU_OPEN_AI_KEY' ) ? AICU_OPEN_AI_KEY : '',
+				$command,
+				$args,
+				$flags
+			);
+
+			if ( empty( $open_ai_key ) ) {
+				do_action( 'qm/error', 'AICU Open AI Key is empty' );
+				return false;
+			}
+
+			$args['-k'] = $open_ai_key;
+		}
+
+		$node_file = escapeshellarg( AICU_PLUGIN_DIR . 'cli/dist/index.js' );
+
+		$node_args = array_map( 'escapeshellarg', $args );
+		$node_args = implode( ' ', $node_args );
+
+		$node_flags = array_map( function ( $key, $value ) {
+			return $key . ' ' . escapeshellarg( $value );
+		}, array_keys( $flags ), $flags );
+		$node_flags = implode( ' ', $node_flags );
+
+		$node_path = escapeshellarg( AICU_PLUGIN_DIR . 'cli/dist' );
+
+		$node_command = "cd {$node_path} && node {$node_file} {$command} {$node_args} {$node_flags} 2>&1";
+
+		exec( $node_command, $output, $result_code );
+
+		$output_string = implode( "\n", $output );
+
+		if ( 0 !== $result_code ) {
+			do_action( 'qm/notice', <<<ERROR
+			AICU CLI Call Error
+			Command: {$node_command}
+			Error: {$output_string}
+			ERROR );
+
+			return false;
+		}
 
 		if ( $is_debug ) {
 			$log_data['time_needed'] = microtime( true ) - $log_data['start_time'];
-			$log_data['$return']     = $data;
+			$log_data['output']     = $output;
+			$log_data['result_code'] = $result_code;
 
 			error_log( 'AICU CLI Call: ' . var_export( $log_data, true ) );
 		}
 
-		if ( 'improve-html' === $command ) {
-			return base64_encode( $data );
-		}
-
-		return $data;
+		return $output_string;
 	}
 }

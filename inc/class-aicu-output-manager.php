@@ -46,32 +46,66 @@ class AICU_Output_Manager {
 	 * @return string
 	 */
 	static function improve_html( string $orig_html ): string {
+		$uniqid = uniqid();
+		$temp_dir = get_temp_dir();
+		$temp_file_base = "aicu-{$uniqid}";
+
 		$filtered_html = apply_filters( 'aicu/improve_html/html', $orig_html );
 		$context = apply_filters( 'aicu/improve_html/context', AICU_Content_Updater::get_context() );
 
-		$b64_impr_html = AICU_Content_Updater::call_cli(
-			'improve-html',
-			array(
-				base64_encode( $filtered_html ),
-			),
-			array(
-				'context' => json_encode( array_filter( $context ) ),
-			)
-		);
+		if ( ! function_exists( 'wp_tempnam' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+		}
 
-		if ( ! $b64_impr_html ) {
+		$temp_html_file = "{$temp_dir}{$temp_file_base}.html";
+		file_put_contents( $temp_html_file, $filtered_html );
+
+		do_action( 'qm/debug', 'temp_file: ' . $temp_html_file );
+
+		if ( ! file_exists( $temp_html_file ) ) {
 			return $orig_html;
 		}
 
-		$impr_html = base64_decode( $b64_impr_html );
+		$cli_output = AICU_Content_Updater::call_cli(
+			'get-report',
+			array( $temp_html_file )
+		);
+
+		$prepared_temp_file = "{$temp_dir}{$temp_file_base}-prepared.html";
+		$prepared_html = file_get_contents( $prepared_temp_file );
+
+		$fixed_temp_file = "{$temp_dir}{$temp_file_base}-fixed.html";
+		$fixed_html = file_get_contents( $fixed_temp_file );
+
+		$report_file = "{$temp_dir}{$temp_file_base}-report.json";
+		$report = json_decode( file_get_contents( $report_file ), true );
+
+		unlink( $temp_html_file );
+		unlink( $prepared_temp_file );
+		unlink( $fixed_temp_file );
+		unlink( $report_file );
+
+		if ( ! $prepared_html || ! $fixed_html ) {
+			return $orig_html;
+		}
 
 		if ( class_exists( 'QM' ) ) {
+			foreach ( $report['issues'] as $issue ) {
+				QM::error( <<<ALERT
+				AIccessibility issue found
+				Code: {$issue['code']}
+				Message: {$issue['message']}
+				Selector: {$issue['selector']}
+				Context: {$issue['context']}
+				ALERT );
+			}
+
 			if ( ! class_exists( 'WP_Text_Diff_Renderer_Table', false ) ) {
 				require ABSPATH . WPINC . '/wp-diff.php';
 			}
 
-			$orig_lines = explode( "\n", normalize_whitespace( $orig_html ) );
-			$impr_lines = explode( "\n", normalize_whitespace( $impr_html ) );
+			$orig_lines = explode( "\n", normalize_whitespace( $prepared_html ) );
+			$impr_lines = explode( "\n", normalize_whitespace( $fixed_html ) );
 
 			$line_diff = new Text_Diff( $orig_lines, $impr_lines );
 
@@ -117,6 +151,6 @@ class AICU_Output_Manager {
 			}
 		}
 
-		return $impr_html;
+		return $fixed_html;
 	}
 }
