@@ -9,8 +9,11 @@
   },
   "scripts": {
     "build": "mkdir -p dist/ && mkdir -p dist/src && npm run dist-install && tsc && npm run copy-assets",
+    "build-windows": "mkdir dist 2>nul || echo dist exists && mkdir dist/src 2>nul || echo dist/src exists && npm run dist-install-windows && tsc && npm run copy-assets-windows",
     "copy-assets": "cp src/prompt.txt src/promptButton.txt dist/src",
+    "copy-assets-windows": "copy src\\prompt.txt dist\\src && copy src\\promptButton.txt dist\\src",
     "dist-install": " cp package.json dist/ && cp package-lock.json dist/ && cd dist && npm install --only=production",
+    "dist-install-windows": "copy package.json dist && copy package-lock.json dist && cd dist && npm install --only=production",
     "dev-alt-text": "ts-node src/index.ts alt-text -k $OPEN_AI_KEY --file img/cloudfest_badges.jpg",
     "start": "node dist/index.js",
     "dev": "ts-node src/index.ts get-report -k $OPEN_AI_KEY '../mocks/html/EduSite.html'",
